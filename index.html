@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notepad Modernizer - Build Your Website (90 Levels)</title>
+    <title>Notepad Modernizer - 90 Levels (Audited)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -20,6 +20,10 @@
             background-image: linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%);
             background-size: 20px 20px;
         }
+        /* CRT Effect for Terminal */
+        .crt-text {
+            text-shadow: 0 0 2px #22c55e;
+        }
     </style>
 </head>
 <body class="bg-neutral-900 text-white h-screen overflow-hidden selection:bg-green-500 selection:text-black">
@@ -28,1108 +32,795 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- AI DEVELOPER ROADMAP (UPDATED) ---
-        const __AI_DEVELOPER_ROADMAP__ = {
-            current_progress: "All 6 Chapters Complete (Levels 1-90)",
-            completed_chapters: [
-                { chapter: 1, levels: "1-12", topic: "Basic Structure", status: "✓ Complete", coverage: "Container, Header, Navigation, Hero, Grid, Footer" },
-                { chapter: 2, levels: "13-25", topic: "Forms & Input", status: "✓ Complete", coverage: "Form structure, Input types, Labels, Buttons, Validation styling" },
-                { chapter: 3, levels: "26-40", topic: "CSS Variables & Themes", status: "✓ Complete", coverage: "CSS custom properties, Color schemes, Dark mode toggle, Theme systems" },
-                { chapter: 4, levels: "41-60", topic: "Advanced Grid Layouts", status: "✓ Complete", coverage: "Grid areas, Named lines, Asymmetric layouts, Bento grids, Magazine layouts" },
-                { chapter: 5, levels: "61-80", topic: "Responsive Design", status: "✓ Complete", coverage: "Media queries, Mobile-first, Breakpoints, Responsive typography, Flexible images" },
-                { chapter: 6, levels: "81-90", topic: "Animations & Polish", status: "✓ Complete", coverage: "Transitions, Keyframes, Hover effects, Loading states, Micro-interactions" }
-            ],
-            architecture_notes: {
-                pattern: "Alternating 'choice' (inject) and 'essay' (edit) levels",
-                markers: "Uses <!-- STEP_X --> markers for code injection points",
-                progression: "Each chapter builds on previous concepts",
-                validation: "Essay levels include regex validation for specific CSS properties",
-                export: "Final code can be exported as standalone HTML file"
-            },
-            future_enhancements: [
-                "Chapter 7: JavaScript basics (event listeners, DOM manipulation)",
-                "Chapter 8: Accessibility (ARIA, semantic HTML, keyboard navigation)",
-                "Chapter 9: Performance optimization (lazy loading, minification)",
-                "Chapter 10: Advanced CSS (custom properties, container queries, has() selector)"
-            ]
-        };
-
         // --- ICONS ---
-        const Icon = ({ path, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{path}</svg>;
+        const Icon = ({ path, className = "" }) => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{path}</svg>;
         const TerminalIcon = () => <Icon path={<><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></>} />;
         const SaveIcon = () => <Icon path={<><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></>} />;
         const CheckCircleIcon = () => <Icon path={<><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></>} />;
         const PlayIcon = () => <Icon path={<polygon points="5 3 19 12 5 21 5 3"></polygon>} />;
         const GlobeIcon = () => <Icon path={<><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></>} />;
-        const BookIcon = () => <Icon path={<><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></>} />;
-        const FolderOpenIcon = () => <Icon path={<><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></>} />;
-        const HelpCircleIcon = () => <Icon path={<><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></>} />;
 
-        // --- ALL 90 LEVELS ---
+        // --- AUDITED LEVEL DATA (90 LEVELS) ---
         const LEVELS = [
             // ========================================
             // CHAPTER 1: BASIC STRUCTURE (1-12)
             // ========================================
             {
-                id: 1,
-                chapter: 1,
-                type: 'choice',
+                id: 1, chapter: 1, type: 'choice',
                 title: { en: '1. The Container', id: '1. Memilih Wadah (Container)' },
                 desc: { en: 'Start modern. Choose the Div structure.', id: 'Mulai dengan modern. Pilih struktur Div.' },
-                targetMarker: '<!-- STEP_1_CONTAINER -->',
+                targetMarker: '',
                 options: [
-                    { label: { en: 'A. Legacy Table', id: 'A. Table (Jadul)' }, previewCode: '<table width="100%">', code: '<table>...</table>', correct: false, msg: { en: 'Tables are for data!', id: 'Table hanya untuk data!' } },
-                    { 
-                        label: { en: 'B. Modern Div', id: 'B. Div Container' }, 
-                        previewCode: '<div class="main">...</div>', 
-                        code: '<div class="main-container">\n    <h1>Halo Dunia</h1>\n    <p>Selamat datang di web saya.</p>\n    \n    <!-- STEP_2_NAV -->\n  </div>', 
-                        cssToAdd: '\n    h1 { color: #333; text-align: left; /* <--- EDIT */ }\n    .main-container { max-width: 800px; margin: 0 auto; padding: 20px; }',
-                        correct: true, 
-                        msg: { en: 'Div injected.', id: 'Div berhasil ditambahkan.' } 
-                    }
+                    { label: { en: 'A. Legacy Table', id: 'A. Table (Jadul)' }, previewCode: '<table width="100%">', code: '<table>...</table>', correct: false, msg: { en: 'Tables are for data, not layout!', id: 'Table hanya untuk data, bukan layout!' } },
+                    { label: { en: 'B. Modern Div', id: 'B. Div Container' }, previewCode: '<div class="main">...</div>', code: '<div class="main-container">\n    <h1>Halo Dunia</h1>\n    <p>Selamat datang di web saya.</p>\n    \n    \n  </div>', cssToAdd: '\n    h1 { color: #333; text-align: left; /* <--- EDIT */ }\n    .main-container { max-width: 800px; margin: 0 auto; padding: 20px; }', correct: true, msg: { en: 'Div injected.', id: 'Div berhasil ditambahkan.' } }
                 ]
             },
             {
-                id: 2,
-                chapter: 1,
-                type: 'essay',
+                id: 2, chapter: 1, type: 'essay',
                 title: { en: '2. Custom Header', id: '2. Kustomisasi Header' },
-                desc: { en: 'Edit the H1 color and text.', id: 'Ubah warna dan teks H1.' },
-                guidance: { en: ['Change <h1> text.', 'Change color to "blue" or "crimson".', 'Change text-align to "center".'], id: ['Ubah teks <h1>.', 'Ganti color jadi "blue" atau "crimson".', 'Ganti text-align jadi "center".'] },
+                desc: { en: 'Edit the H1 color and alignment.', id: 'Ubah warna dan posisi teks H1.' },
+                guidance: { en: ['Change text-align to "center".', 'Change color to "blue" or "#2563eb".'], id: ['Ganti text-align jadi "center".', 'Ganti color jadi "blue" atau "#2563eb".'] },
                 validation: (code) => /text-align:\s*center/i.test(code),
-                successMsg: { en: 'Header styled!', id: 'Header sudah cantik!' }
+                successMsg: { en: 'Header centered!', id: 'Header di tengah!' }
             },
             {
-                id: 3,
-                chapter: 1,
-                type: 'choice',
+                id: 3, chapter: 1, type: 'choice',
                 title: { en: '3. Navigation Bar', id: '3. Navigasi' },
                 desc: { en: 'Add a menu using Flexbox.', id: 'Tambah menu menggunakan Flexbox.' },
-                targetMarker: '<!-- STEP_2_NAV -->',
+                targetMarker: '',
                 options: [
-                    { label: { en: 'A. Vertical Block', id: 'A. Block (Vertikal)' }, previewCode: 'display: block;', code: '...', correct: false, msg: { en: 'Not for a top menu.', id: 'Kurang cocok untuk menu atas.' } },
-                    { 
-                        label: { en: 'B. Flex Row', id: 'B. Flexbox (Horizontal)' }, 
-                        previewCode: 'display: flex; gap: 20px;', 
-                        code: '<nav class="menu-box">\n      <a href="#">Beranda</a>\n      <a href="#">Produk</a>\n      <a href="#">Kontak</a>\n    </nav>\n    <!-- STEP_3_HERO -->', 
-                        cssToAdd: '\n    .menu-box { display: flex; gap: 20px; padding: 10px 0; border-bottom: 1px solid #ccc; /* <--- EDIT */ }\n    .menu-box a { text-decoration: none; color: #555; font-weight: bold; }',
-                        correct: true, 
-                        msg: { en: 'Nav injected.', id: 'Navigasi ditambahkan.' } 
-                    }
+                    { label: { en: 'A. Vertical List', id: 'A. List Vertikal' }, previewCode: '<ul><li>...</li></ul>', code: '...', correct: false, msg: { en: 'We want a horizontal menu.', id: 'Kita mau menu horizontal.' } },
+                    { label: { en: 'B. Flex Row', id: 'B. Flexbox (Horizontal)' }, previewCode: 'display: flex; gap: 20px;', code: '<nav class="menu-box">\n      <a href="#">Beranda</a>\n      <a href="#">Produk</a>\n      <a href="#">Kontak</a>\n    </nav>\n    ', cssToAdd: '\n    .menu-box { display: flex; gap: 20px; padding: 10px 0; border-bottom: 1px solid #ccc; /* <--- EDIT */ }\n    .menu-box a { text-decoration: none; color: #555; font-weight: bold; }', correct: true, msg: { en: 'Nav injected.', id: 'Navigasi ditambahkan.' } }
                 ]
             },
             {
-                id: 4,
-                chapter: 1,
-                type: 'essay',
+                id: 4, chapter: 1, type: 'essay',
                 title: { en: '4. Style Links', id: '4. Edit Menu' },
-                desc: { en: 'Space them out and change links.', id: 'Beri jarak dan ubah nama link.' },
-                guidance: { en: ['Change link text (Beranda → Home).', 'Increase gap to 40px.', 'Change border color.'], id: ['Ubah teks link (Beranda → Home).', 'Perbesar gap jadi 40px.', 'Ubah warna border.'] },
+                desc: { en: 'Space them out and change style.', id: 'Beri jarak dan ubah gaya.' },
+                guidance: { en: ['Increase gap to 40px.', 'Change border-bottom color to #333.'], id: ['Perbesar gap jadi 40px.', 'Ubah warna border-bottom jadi #333.'] },
                 validation: (code) => /gap:\s*(?!20px)/i.test(code),
-                successMsg: { en: 'Links updated!', id: 'Link diperbarui!' }
+                successMsg: { en: 'Links spaced!', id: 'Link berjarak!' }
             },
             {
-                id: 5,
-                chapter: 1,
-                type: 'choice',
+                id: 5, chapter: 1, type: 'choice',
                 title: { en: '5. Hero Section', id: '5. Hero Section (Banner)' },
                 desc: { en: 'Add a big banner area.', id: 'Tambahkan area banner besar.' },
-                targetMarker: '<!-- STEP_3_HERO -->',
+                targetMarker: '',
                 options: [
-                    { label: { en: 'A. Image Tag', id: 'A. Tag Gambar Biasa' }, previewCode: '<img src="...">', code: '...', correct: false, msg: { en: 'Too simple for a hero.', id: 'Terlalu sederhana untuk Hero.' } },
-                    { 
-                        label: { en: 'B. Hero Banner', id: 'B. Hero Banner (Background)' }, 
-                        previewCode: 'background-color: #eee; padding: 50px;', 
-                        code: '<div class="hero">\n      <h2>Welcome to Future</h2>\n      <p>Building the web, one div at a time.</p>\n    </div>\n    <!-- STEP_4_GRID -->', 
-                        cssToAdd: '\n    .hero { \n      background-color: #f3f4f6; /* <--- GANTI BG */\n      padding: 60px 20px; \n      text-align: center; \n      border-radius: 10px; \n      margin-top: 20px; \n    }\n    .hero h2 { font-size: 2em; margin-bottom: 10px; }',
-                        correct: true, 
-                        msg: { en: 'Hero injected.', id: 'Banner Hero ditambahkan.' } 
-                    }
+                    { label: { en: 'A. Text Only', id: 'A. Teks Saja' }, previewCode: '<p>Welcome</p>', code: '...', correct: false, msg: { en: 'Too boring.', id: 'Membosankan.' } },
+                    { label: { en: 'B. Hero Banner', id: 'B. Hero Banner' }, previewCode: 'background-color: #eee;', code: '<div class="hero">\n      <h2>Welcome to Future</h2>\n      <p>Building the web, one div at a time.</p>\n    </div>\n    ', cssToAdd: '\n    .hero { \n      background-color: #f3f4f6; /* <--- GANTI BG */\n      padding: 60px 20px; \n      text-align: center; \n      border-radius: 10px; \n      margin-top: 20px; \n    }\n    .hero h2 { font-size: 2em; margin-bottom: 10px; }', correct: true, msg: { en: 'Hero injected.', id: 'Banner Hero ditambahkan.' } }
                 ]
             },
             {
-                id: 6,
-                chapter: 1,
-                type: 'essay',
+                id: 6, chapter: 1, type: 'essay',
                 title: { en: '6. Customize Hero', id: '6. Kustomisasi Banner' },
-                desc: { en: 'Make the banner pop! Change background.', id: 'Buat banner menonjol! Ganti background.' },
-                guidance: { en: ['Change background-color to #e0e7ff (light blue).', 'Change padding to 100px.', 'Edit the H2 text.'], id: ['Ganti background-color jadi #e0e7ff (biru muda).', 'Ubah padding jadi 100px agar besar.', 'Ubah teks H2.'] },
+                desc: { en: 'Make the banner pop!', id: 'Buat banner menonjol!' },
+                guidance: { en: ['Change background-color to #e0e7ff.', 'Increase padding to 100px.'], id: ['Ganti background-color jadi #e0e7ff.', 'Ubah padding jadi 100px.'] },
                 validation: (code) => /padding:\s*(?!60px)/i.test(code),
                 successMsg: { en: 'Hero looks big!', id: 'Banner terlihat megah!' }
             },
             {
-                id: 7,
-                chapter: 1,
-                type: 'choice',
-                title: { en: '7. Content Layout', id: '7. Layout Konten' },
-                desc: { en: 'Choose how to display your articles.', id: 'Pilih cara menampilkan artikelmu.' },
-                targetMarker: '<!-- STEP_4_GRID -->',
+                id: 7, chapter: 1, type: 'choice',
+                title: { en: '7. Content Grid', id: '7. Grid Konten' },
+                desc: { en: 'Choose structure for articles.', id: 'Pilih struktur artikel.' },
+                targetMarker: '',
                 options: [
-                    { 
-                        label: { en: 'A. Float (Legacy)', id: 'A. Float (Jadul)' }, 
-                        previewCode: 'float: left; width: 33%;', 
-                        code: '...', 
-                        correct: false, 
-                        msg: { en: 'Floats are brittle.', id: 'Float mudah berantakan.' } 
-                    },
-                    { 
-                        label: { en: 'B. Grid 3 Columns', id: 'B. Grid 3 Kolom' }, 
-                        previewCode: 'grid-template-columns: 1fr 1fr 1fr;', 
-                        code: '<div class="grid-box">\n      <div class="card">Fitur A</div>\n      <div class="card">Fitur B</div>\n      <div class="card">Fitur C</div>\n    </div>\n    <!-- STEP_5_FOOTER -->', 
-                        cssToAdd: '\n    .grid-box { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 30px; /* <--- EDIT KOLOM */ }\n    .card { background: white; border: 1px solid #ddd; padding: 20px; border-radius: 8px; color: #333; }',
-                        correct: true, 
-                        msg: { en: '3 Col Grid added.', id: 'Grid 3 Kolom ditambahkan.' } 
-                    }
+                    { label: { en: 'A. Float Layout', id: 'A. Layout Float' }, previewCode: 'float: left;', code: '...', correct: false, msg: { en: 'Floats are obsolete.', id: 'Float sudah usang.' } },
+                    { label: { en: 'B. CSS Grid', id: 'B. CSS Grid' }, previewCode: 'display: grid;', code: '<div class="grid-box">\n      <div class="card">Fitur A</div>\n      <div class="card">Fitur B</div>\n      <div class="card">Fitur C</div>\n    </div>\n    ', cssToAdd: '\n    .grid-box { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 30px; /* <--- EDIT KOLOM */ }\n    .card { background: white; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }', correct: true, msg: { en: 'Grid added.', id: 'Grid ditambahkan.' } }
                 ]
             },
             {
-                id: 8,
-                chapter: 1,
-                type: 'essay',
+                id: 8, chapter: 1, type: 'essay',
                 title: { en: '8. Card Styling', id: '8. Kustomisasi Kartu' },
-                desc: { en: 'Style the cards. Add shadows or borders.', id: 'Hias kartu konten. Tambahkan shadow atau border.' },
-                guidance: { en: ['Add "box-shadow: 0 4px 8px rgba(0,0,0,0.1)" to .card.', 'Change card background.', 'Try changing border-radius.'], id: ['Tambahkan "box-shadow: 0 4px 8px rgba(0,0,0,0.1)" ke .card.', 'Ganti warna background kartu.', 'Coba ubah border-radius.'] },
-                validation: (code) => /box-shadow:/i.test(code) || /background:/i.test(code),
+                desc: { en: 'Style the cards.', id: 'Hias kartu konten.' },
+                guidance: { en: ['Add "box-shadow: 0 4px 8px rgba(0,0,0,0.1)" to .card.', 'Change background color to #fafafa.'], id: ['Tambahkan "box-shadow: 0 4px 8px rgba(0,0,0,0.1)" ke .card.', 'Ganti background jadi #fafafa.'] },
+                validation: (code) => /box-shadow:/i.test(code),
                 successMsg: { en: 'Cards look modern!', id: 'Kartu terlihat modern!' }
             },
             {
-                id: 9,
-                chapter: 1,
-                type: 'choice',
-                title: { en: '9. Footer', id: '9. Footer (Kaki Website)' },
-                desc: { en: 'Close the page with a footer.', id: 'Tutup halaman dengan footer.' },
-                targetMarker: '<!-- STEP_5_FOOTER -->',
+                id: 9, chapter: 1, type: 'choice',
+                title: { en: '9. Footer', id: '9. Footer' },
+                desc: { en: 'Add the footer.', id: 'Tambahkan footer.' },
+                targetMarker: '',
                 options: [
-                    { label: { en: 'A. Empty Div', id: 'A. Div Kosong' }, previewCode: '<div></div>', code: '...', correct: false, msg: { en: 'Too empty.', id: 'Terlalu kosong.' } },
-                    { 
-                        label: { en: 'B. Semantic Footer', id: 'B. Footer Semantik' }, 
-                        previewCode: '<footer>&copy; 2024</footer>', 
-                        code: '<footer class="site-footer">\n      &copy; 2024 Website Buatanku. All rights reserved.\n    </footer>', 
-                        cssToAdd: '\n    .site-footer { margin-top: 50px; padding: 20px; text-align: center; color: #888; border-top: 1px solid #eee; font-size: 0.9em; /* <--- EDIT */ }',
-                        correct: true, 
-                        msg: { en: 'Footer added.', id: 'Footer ditambahkan.' } 
-                    }
+                    { label: { en: 'A. Semantic Footer', id: 'A. Footer Semantik' }, previewCode: '<footer>...</footer>', code: '<footer class="site-footer">\n      &copy; 2024 Website Buatanku.\n    </footer>', cssToAdd: '\n    .site-footer { margin-top: 50px; padding: 20px; text-align: center; color: #888; border-top: 1px solid #eee; }', correct: true, msg: { en: 'Footer added.', id: 'Footer ditambahkan.' } },
+                    { label: { en: 'B. Just text', id: 'B. Teks biasa' }, previewCode: '<p>End</p>', code: '...', correct: false, msg: { en: 'Use standard tags.', id: 'Gunakan tag standar.' } }
                 ]
             },
             {
-                id: 10,
-                chapter: 1,
-                type: 'essay',
-                title: { en: '10. Footer Polish', id: '10. Sentuhan Akhir Footer' },
-                desc: { en: 'Personalize the footer.', id: 'Personalisasi footer.' },
-                guidance: { en: ['Change the copyright year/name.', 'Make footer background dark (bg: #333, color: white).', 'Add padding.'], id: ['Ganti tahun/nama copyright.', 'Buat background footer gelap (bg: #333, color: white).', 'Tambah padding.'] },
-                validation: (code) => /color:/i.test(code),
-                successMsg: { en: 'Footer complete!', id: 'Footer selesai!' }
+                id: 10, chapter: 1, type: 'essay',
+                title: { en: '10. Footer Polish', id: '10. Sentuhan Footer' },
+                desc: { en: 'Customize the footer.', id: 'Personalisasi footer.' },
+                guidance: { en: ['Change text-align to "right".', 'Change color to #555.'], id: ['Ganti text-align jadi "right".', 'Ganti color jadi #555.'] },
+                validation: (code) => /text-align:\s*right/i.test(code),
+                successMsg: { en: 'Footer aligned!', id: 'Footer rata kanan!' }
             },
             {
-                id: 11,
-                chapter: 1,
-                type: 'essay',
-                title: { en: '11. Body Styling', id: '11. Gaya Body' },
-                desc: { en: 'Style the entire page body.', id: 'Atur gaya untuk seluruh halaman.' },
-                guidance: { en: ['Change body background-color to #fafafa.', 'Add font-family: "Arial", sans-serif;', 'Try line-height: 1.6;'], id: ['Ubah background-color body jadi #fafafa.', 'Tambah font-family: "Arial", sans-serif;', 'Coba line-height: 1.6;'] },
-                validation: (code) => /line-height:/i.test(code),
-                successMsg: { en: 'Page styled!', id: 'Halaman sudah rapi!' }
+                id: 11, chapter: 1, type: 'essay',
+                title: { en: '11. Global Fonts', id: '11. Font Global' },
+                desc: { en: 'Change font of the body.', id: 'Ubah font body.' },
+                guidance: { en: ['Add font-family: "Verdana", sans-serif; to body.', 'Add line-height: 1.6;'], id: ['Tambah font-family: "Verdana", sans-serif; ke body.', 'Tambah line-height: 1.6;'] },
+                validation: (code) => /font-family:/i.test(code),
+                successMsg: { en: 'Typography set!', id: 'Tipografi diatur!' }
             },
             {
-                id: 12,
-                chapter: 1,
-                type: 'essay',
-                title: { en: '12. Chapter 1 Complete!', id: '12. Bab 1 Selesai!' },
-                desc: { en: 'Review and finalize your basic structure.', id: 'Tinjau dan finalisasi struktur dasar.' },
-                guidance: { en: ['Review all sections (header, nav, hero, grid, footer).', 'Make any final adjustments.', 'Ready for Chapter 2: Forms!'], id: ['Tinjau semua bagian (header, nav, hero, grid, footer).', 'Buat penyesuaian akhir.', 'Siap untuk Bab 2: Forms!'] },
+                id: 12, chapter: 1, type: 'essay',
+                title: { en: '12. Review', id: '12. Review' },
+                desc: { en: 'Check everything.', id: 'Cek semuanya.' },
+                guidance: { en: ['Ensure no visual bugs.', 'Click Save Changes to finish chapter.'], id: ['Pastikan tidak ada bug visual.', 'Klik Simpan untuk selesaikan bab.'] },
                 validation: (code) => true,
-                successMsg: { en: 'Chapter 1 Complete! 🎉', id: 'Bab 1 Selesai! 🎉' }
+                successMsg: { en: 'Chapter 1 Done!', id: 'Bab 1 Selesai!' }
             },
 
             // ========================================
             // CHAPTER 2: FORMS & INPUT (13-25)
             // ========================================
             {
-                id: 13,
-                chapter: 2,
-                type: 'choice',
-                title: { en: '13. Contact Form', id: '13. Form Kontak' },
-                desc: { en: 'Add a contact form section.', id: 'Tambahkan bagian form kontak.' },
-                targetMarker: '<!-- STEP_5_FOOTER -->',
+                id: 13, chapter: 2, type: 'choice',
+                title: { en: '13. Contact Section', id: '13. Bagian Kontak' },
+                desc: { en: 'Inject a form container.', id: 'Suntikkan wadah form.' },
+                targetMarker: '',
                 options: [
-                    { label: { en: 'A. Table Form', id: 'A. Form dengan Table' }, previewCode: '<table><tr><td>Name</td></tr></table>', code: '...', correct: false, msg: { en: 'No tables for forms!', id: 'Jangan pakai table untuk form!' } },
-                    { 
-                        label: { en: 'B. Div Form', id: 'B. Form dengan Div' }, 
-                        previewCode: '<form><div class="field">...', 
-                        code: '<section class="contact-section">\n      <h2>Hubungi Kami</h2>\n      <form class="contact-form">\n        <!-- STEP_14_INPUTS -->\n      </form>\n    </section>\n    <!-- STEP_5_FOOTER -->', 
-                        cssToAdd: '\n    .contact-section { margin-top: 40px; }\n    .contact-section h2 { color: #333; margin-bottom: 20px; /* <--- EDIT */ }\n    .contact-form { max-width: 500px; margin: 0 auto; }',
-                        correct: true, 
-                        msg: { en: 'Form section added.', id: 'Bagian form ditambahkan.' } 
-                    }
+                    { label: { en: 'A. Form Block', id: 'A. Blok Form' }, previewCode: '<form>...</form>', code: '<section class="contact-section">\n      <h2>Contact Us</h2>\n      <form class="contact-form">\n        \n      </form>\n    </section>\n    ', cssToAdd: '\n    .contact-section { margin-top: 40px; }\n    .contact-form { max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; }', correct: true, msg: { en: 'Form block added.', id: 'Blok form ditambahkan.' } }
                 ]
             },
             {
-                id: 14,
-                chapter: 2,
-                type: 'choice',
-                title: { en: '14. Text Input', id: '14. Input Teks' },
-                desc: { en: 'Add name and email inputs.', id: 'Tambahkan input nama dan email.' },
-                targetMarker: '<!-- STEP_14_INPUTS -->',
+                id: 14, chapter: 2, type: 'choice',
+                title: { en: '14. Input Fields', id: '14. Input Field' },
+                desc: { en: 'Add name and email.', id: 'Tambah nama dan email.' },
+                targetMarker: '',
                 options: [
-                    { label: { en: 'A. No Labels', id: 'A. Tanpa Label' }, previewCode: '<input type="text">', code: '...', correct: false, msg: { en: 'Always use labels!', id: 'Selalu pakai label!' } },
-                    { 
-                        label: { en: 'B. With Labels', id: 'B. Dengan Label' }, 
-                        previewCode: '<label>Name:</label><input>', 
-                        code: '<div class="form-field">\n          <label for="name">Nama:</label>\n          <input type="text" id="name" placeholder="Nama Anda">\n        </div>\n        <div class="form-field">\n          <label for="email">Email:</label>\n          <input type="email" id="email" placeholder="email@contoh.com">\n        </div>\n        <!-- STEP_15_TEXTAREA -->', 
-                        cssToAdd: '\n    .form-field { margin-bottom: 15px; /* <--- EDIT */ }\n    .form-field label { display: block; margin-bottom: 5px; color: #555; font-weight: bold; }\n    .form-field input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }',
-                        correct: true, 
-                        msg: { en: 'Inputs added.', id: 'Input ditambahkan.' } 
-                    }
+                    { label: { en: 'A. Inputs with Labels', id: 'A. Input dengan Label' }, previewCode: '<label>...</label><input>', code: '<div class="field">\n          <label>Name</label>\n          <input type="text" class="inp" placeholder="Your Name">\n        </div>\n        <div class="field">\n          <label>Email</label>\n          <input type="email" class="inp" placeholder="Your Email">\n        </div>\n        ', cssToAdd: '\n    .field { margin-bottom: 15px; }\n    .inp { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }', correct: true, msg: { en: 'Inputs added.', id: 'Input ditambahkan.' } }
                 ]
             },
             {
-                id: 15,
-                chapter: 2,
-                type: 'choice',
-                title: { en: '15. Textarea', id: '15. Area Pesan' },
-                desc: { en: 'Add a message textarea.', id: 'Tambahkan area untuk pesan.' },
-                targetMarker: '<!-- STEP_15_TEXTAREA -->',
+                id: 15, chapter: 2, type: 'essay',
+                title: { en: '15. Input Style', id: '15. Gaya Input' },
+                desc: { en: 'Make inputs look better.', id: 'Buat input lebih bagus.' },
+                guidance: { en: ['Change .inp padding to 12px.', 'Change border-radius to 6px.'], id: ['Ubah padding .inp jadi 12px.', 'Ubah border-radius jadi 6px.'] },
+                validation: (code) => /padding:\s*12px/i.test(code),
+                successMsg: { en: 'Inputs optimized.', id: 'Input dioptimalkan.' }
+            },
+            {
+                id: 16, chapter: 2, type: 'choice',
+                title: { en: '16. Action Button', id: '16. Tombol Aksi' },
+                desc: { en: 'Add submit button.', id: 'Tambah tombol kirim.' },
+                targetMarker: '',
                 options: [
-                    { label: { en: 'A. Single Line', id: 'A. Satu Baris' }, previewCode: '<input type="text">', code: '...', correct: false, msg: { en: 'Use textarea for long text!', id: 'Pakai textarea untuk teks panjang!' } },
-                    { 
-                        label: { en: 'B. Multi-line', id: 'B. Multi-baris' }, 
-                        previewCode: '<textarea rows="4">', 
-                        code: '<div class="form-field">\n          <label for="message">Pesan:</label>\n          <textarea id="message" rows="5" placeholder="Tulis pesan Anda..."></textarea>\n        </div>\n        <!-- STEP_16_BUTTON -->', 
-                        cssToAdd: '\n    .form-field textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; box-sizing: border-box; resize: vertical; /* <--- EDIT */ }',
-                        correct: true, 
-                        msg: { en: 'Textarea added.', id: 'Textarea ditambahkan.' } 
-                    }
+                    { label: { en: 'A. Button Tag', id: 'A. Tag Button' }, previewCode: '<button>...</button>', code: '<button type="submit" class="btn">Send Message</button>', cssToAdd: '\n    .btn { background: #333; color: white; border: none; padding: 10px 20px; cursor: pointer; width: 100%; }', correct: true, msg: { en: 'Button added.', id: 'Tombol ditambahkan.' } }
                 ]
             },
             {
-                id: 16,
-                chapter: 2,
-                type: 'choice',
-                title: { en: '16. Submit Button', id: '16. Tombol Kirim' },
-                desc: { en: 'Add a submit button.', id: 'Tambahkan tombol kirim.' },
-                targetMarker: '<!-- STEP_16_BUTTON -->',
+                id: 17, chapter: 2, type: 'essay',
+                title: { en: '17. Button Color', id: '17. Warna Tombol' },
+                desc: { en: 'Make the button stand out.', id: 'Buat tombol mencolok.' },
+                guidance: { en: ['Change .btn background to #2563eb (blue).', 'Add font-weight: bold;'], id: ['Ubah background .btn jadi #2563eb (biru).', 'Tambah font-weight: bold;'] },
+                validation: (code) => /background:\s*#2563eb/i.test(code),
+                successMsg: { en: 'Button popped!', id: 'Tombol menonjol!' }
+            },
+            {
+                id: 18, chapter: 2, type: 'essay',
+                title: { en: '18. Form Shadow', id: '18. Shadow Form' },
+                desc: { en: 'Add depth to the form.', id: 'Beri kedalaman pada form.' },
+                guidance: { en: ['Add box-shadow: 0 5px 15px rgba(0,0,0,0.1); to .contact-form.', 'Remove border if you want.'], id: ['Tambah box-shadow: 0 5px 15px rgba(0,0,0,0.1); ke .contact-form.', 'Hapus border jika mau.'] },
+                validation: (code) => /box-shadow:/i.test(code),
+                successMsg: { en: 'Form has depth.', id: 'Form punya kedalaman.' }
+            },
+            {
+                id: 19, chapter: 2, type: 'essay',
+                title: { en: '19. Label Weight', id: '19. Ketebalan Label' },
+                desc: { en: 'Make labels bold.', id: 'Tebalkan label.' },
+                guidance: { en: ['Add to .field label: font-weight: bold;', 'Add display: block; margin-bottom: 5px;'], id: ['Tambah ke .field label: font-weight: bold;', 'Tambah display: block; margin-bottom: 5px;'] },
+                validation: (code) => /font-weight:\s*bold/i.test(code),
+                successMsg: { en: 'Labels bold!', id: 'Label tebal!' }
+            },
+            {
+                id: 20, chapter: 2, type: 'choice',
+                title: { en: '20. Textarea', id: '20. Textarea' },
+                desc: { en: 'Add message box before button.', id: 'Tambah kotak pesan sebelum tombol.' },
+                targetMarker: '<button type="submit"',
                 options: [
-                    { label: { en: 'A. Link', id: 'A. Link Biasa' }, previewCode: '<a href="#">Submit</a>', code: '...', correct: false, msg: { en: 'Use button element!', id: 'Pakai elemen button!' } },
-                    { 
-                        label: { en: 'B. Button', id: 'B. Button Element' }, 
-                        previewCode: '<button type="submit">', 
-                        code: '<button type="submit" class="submit-btn">Kirim Pesan</button>', 
-                        cssToAdd: '\n    .submit-btn { \n      background-color: #3b82f6; /* <--- EDIT */\n      color: white; \n      padding: 12px 30px; \n      border: none; \n      border-radius: 6px; \n      font-size: 1em; \n      font-weight: bold; \n      cursor: pointer; \n    }\n    .submit-btn:hover { background-color: #2563eb; }',
-                        correct: true, 
-                        msg: { en: 'Button added.', id: 'Tombol ditambahkan.' } 
-                    }
+                   { label: { en: 'A. Textarea', id: 'A. Textarea' }, previewCode: '<textarea>', code: '<div class="field"><label>Message</label><textarea class="inp" rows="4"></textarea></div>\n        <button type="submit"', cssToAdd: '', correct: true, msg: { en: 'Textarea inserted.', id: 'Textarea disisipkan.' } }
                 ]
             },
             {
-                id: 17,
-                chapter: 2,
-                type: 'essay',
-                title: { en: '17. Style Inputs', id: '17. Gaya Input' },
-                desc: { en: 'Improve input styling.', id: 'Tingkatkan gaya input.' },
-                guidance: { en: ['Change input border to 2px solid #ddd.', 'Add focus state: input:focus { border-color: #3b82f6; }', 'Increase padding to 12px.'], id: ['Ubah border input jadi 2px solid #ddd.', 'Tambah focus state: input:focus { border-color: #3b82f6; }', 'Perbesar padding jadi 12px.'] },
-                validation: (code) => /input:focus/i.test(code),
-                successMsg: { en: 'Inputs styled!', id: 'Input sudah cantik!' }
+                id: 21, chapter: 2, type: 'essay',
+                title: { en: '21. Textarea Resize', id: '21. Resize Textarea' },
+                desc: { en: 'Prevent horizontal resize.', id: 'Cegah resize horizontal.' },
+                guidance: { en: ['Add to textarea.inp: resize: vertical;', 'This prevents breaking layout.'], id: ['Tambah ke textarea.inp: resize: vertical;', 'Ini mencegah layout rusak.'] },
+                validation: (code) => /resize:\s*vertical/i.test(code),
+                successMsg: { en: 'Resize controlled.', id: 'Resize terkontrol.' }
             },
             {
-                id: 18,
-                chapter: 2,
-                type: 'essay',
-                title: { en: '18. Button Effects', id: '18. Efek Tombol' },
-                desc: { en: 'Add hover and active effects to button.', id: 'Tambahkan efek hover dan active ke tombol.' },
-                guidance: { en: ['Already has :hover. Add :active { transform: scale(0.98); }', 'Try adding transition: all 0.2s;', 'Change hover background color.'], id: ['Sudah ada :hover. Tambah :active { transform: scale(0.98); }', 'Coba tambah transition: all 0.2s;', 'Ubah warna background hover.'] },
-                validation: (code) => /transform:\s*scale/i.test(code) || /transition:/i.test(code),
-                successMsg: { en: 'Button interactive!', id: 'Tombol interaktif!' }
+                id: 22, chapter: 2, type: 'essay',
+                title: { en: '22. Focus State', id: '22. Status Fokus' },
+                desc: { en: 'Highlight input when clicked.', id: 'Highlight input saat diklik.' },
+                guidance: { en: ['Add .inp:focus { border-color: #2563eb; outline: none; }'], id: ['Tambah .inp:focus { border-color: #2563eb; outline: none; }'] },
+                validation: (code) => /\.inp:focus/i.test(code),
+                successMsg: { en: 'Focus state active.', id: 'Status fokus aktif.' }
             },
             {
-                id: 19,
-                chapter: 2,
-                type: 'essay',
-                title: { en: '19. Form Spacing', id: '19. Jarak Form' },
-                desc: { en: 'Adjust spacing in form.', id: 'Atur jarak dalam form.' },
-                guidance: { en: ['Change .form-field margin-bottom to 20px.', 'Add margin-top to submit button.', 'Try padding adjustments.'], id: ['Ubah .form-field margin-bottom jadi 20px.', 'Tambah margin-top ke tombol submit.', 'Coba sesuaikan padding.'] },
-                validation: (code) => /margin-bottom:\s*(?!15px)/i.test(code),
-                successMsg: { en: 'Form spacing improved!', id: 'Jarak form diperbaiki!' }
+                id: 23, chapter: 2, type: 'essay',
+                title: { en: '23. Button Hover', id: '23. Hover Tombol' },
+                desc: { en: 'Change button on hover.', id: 'Ubah tombol saat hover.' },
+                guidance: { en: ['Add .btn:hover { opacity: 0.9; }', 'Or change background color.'], id: ['Tambah .btn:hover { opacity: 0.9; }', 'Atau ubah warna background.'] },
+                validation: (code) => /\.btn:hover/i.test(code),
+                successMsg: { en: 'Hover added.', id: 'Hover ditambahkan.' }
             },
             {
-                id: 20,
-                chapter: 2,
-                type: 'essay',
-                title: { en: '20. Label Styling', id: '20. Gaya Label' },
-                desc: { en: 'Style form labels.', id: 'Atur gaya label form.' },
-                guidance: { en: ['Change label color.', 'Try font-size: 0.9em;', 'Add text-transform: uppercase;'], id: ['Ubah warna label.', 'Coba font-size: 0.9em;', 'Tambah text-transform: uppercase;'] },
-                validation: (code) => /text-transform:/i.test(code) || /font-size.*0\.9/i.test(code),
-                successMsg: { en: 'Labels styled!', id: 'Label sudah rapi!' }
-            },
-            {
-                id: 21,
-                chapter: 2,
-                type: 'essay',
-                title: { en: '21. Input Border Radius', id: '21. Sudut Input' },
-                desc: { en: 'Round the corners more.', id: 'Bulatkan sudut lebih banyak.' },
-                guidance: { en: ['Change input border-radius to 8px.', 'Try 12px for more rounded.', 'Update textarea too.'], id: ['Ubah border-radius input jadi 8px.', 'Coba 12px untuk lebih bulat.', 'Update textarea juga.'] },
+                id: 24, chapter: 2, type: 'essay',
+                title: { en: '24. Roundness', id: '24. Kebulatan' },
+                desc: { en: 'Round the corners.', id: 'Bulatkan sudut.' },
+                guidance: { en: ['Change .contact-form border-radius to 10px.', 'Change .btn border-radius to 6px.'], id: ['Ubah border-radius .contact-form jadi 10px.', 'Ubah border-radius .btn jadi 6px.'] },
                 validation: (code) => /border-radius:\s*(?!4px)/i.test(code),
-                successMsg: { en: 'Corners rounded!', id: 'Sudut dibulatkan!' }
+                successMsg: { en: 'Rounded!', id: 'Dibulatkan!' }
             },
             {
-                id: 22,
-                chapter: 2,
-                type: 'essay',
-                title: { en: '22. Placeholder Styling', id: '22. Gaya Placeholder' },
-                desc: { en: 'Style placeholder text.', id: 'Atur gaya teks placeholder.' },
-                guidance: { en: ['Add: input::placeholder { color: #999; }', 'Try opacity: 0.7;', 'Add font-style: italic;'], id: ['Tambah: input::placeholder { color: #999; }', 'Coba opacity: 0.7;', 'Tambah font-style: italic;'] },
-                validation: (code) => /::placeholder/i.test(code),
-                successMsg: { en: 'Placeholder styled!', id: 'Placeholder sudah cantik!' }
-            },
-            {
-                id: 23,
-                chapter: 2,
-                type: 'essay',
-                title: { en: '23. Form Shadow', id: '23. Shadow Form' },
-                desc: { en: 'Add shadow to form container.', id: 'Tambahkan shadow ke container form.' },
-                guidance: { en: ['Add to .contact-form: box-shadow: 0 2px 10px rgba(0,0,0,0.1);', 'Try adding background: white;', 'Add padding: 30px;'], id: ['Tambah ke .contact-form: box-shadow: 0 2px 10px rgba(0,0,0,0.1);', 'Coba tambah background: white;', 'Tambah padding: 30px;'] },
-                validation: (code) => /box-shadow.*contact-form/is.test(code) || /\.contact-form[\s\S]*box-shadow/i.test(code),
-                successMsg: { en: 'Form has depth!', id: 'Form punya kedalaman!' }
-            },
-            {
-                id: 24,
-                chapter: 2,
-                type: 'essay',
-                title: { en: '24. Button Width', id: '24. Lebar Tombol' },
-                desc: { en: 'Make button full width.', id: 'Buat tombol selebar penuh.' },
-                guidance: { en: ['Add width: 100%; to .submit-btn.', 'Try margin-top: 10px;', 'Adjust padding if needed.'], id: ['Tambah width: 100%; ke .submit-btn.', 'Coba margin-top: 10px;', 'Sesuaikan padding jika perlu.'] },
-                validation: (code) => /width:\s*100%/i.test(code),
-                successMsg: { en: 'Button full width!', id: 'Tombol penuh!' }
-            },
-            {
-                id: 25,
-                chapter: 2,
-                type: 'essay',
-                title: { en: '25. Chapter 2 Complete!', id: '25. Bab 2 Selesai!' },
-                desc: { en: 'Review your form. Ready for CSS variables!', id: 'Tinjau form Anda. Siap untuk CSS variables!' },
-                guidance: { en: ['Check all form elements.', 'Test visual hierarchy.', 'Ready for theming!'], id: ['Cek semua elemen form.', 'Test hierarki visual.', 'Siap untuk theming!'] },
+                id: 25, chapter: 2, type: 'essay',
+                title: { en: '25. Check Form', id: '25. Cek Form' },
+                desc: { en: 'Final check for Chapter 2.', id: 'Cek akhir Bab 2.' },
+                guidance: { en: ['Looks good?', 'Save to proceed.'], id: ['Terlihat bagus?', 'Simpan untuk lanjut.'] },
                 validation: (code) => true,
-                successMsg: { en: 'Chapter 2 Complete! 🎨', id: 'Bab 2 Selesai! 🎨' }
+                successMsg: { en: 'Chapter 2 Done!', id: 'Bab 2 Selesai!' }
             },
 
             // ========================================
-            // CHAPTER 3: CSS VARIABLES & THEMES (26-40)
+            // CHAPTER 3: CSS VARIABLES (26-40)
             // ========================================
             {
-                id: 26,
-                chapter: 3,
-                type: 'choice',
-                title: { en: '26. CSS Variables Intro', id: '26. Pengenalan CSS Variables' },
-                desc: { en: 'Start using CSS custom properties.', id: 'Mulai pakai CSS custom properties.' },
+                id: 26, chapter: 3, type: 'choice',
+                title: { en: '26. Variable Block', id: '26. Blok Variabel' },
+                desc: { en: 'Initialize CSS Variables.', id: 'Inisialisasi CSS Variables.' },
                 targetMarker: '/* === AREA CSS KAMU ADA DI BAWAH === */',
                 options: [
-                    { label: { en: 'A. Inline Values', id: 'A. Nilai Inline' }, previewCode: 'color: #3b82f6;', code: '...', correct: false, msg: { en: 'Hard to maintain!', id: 'Susah di-maintain!' } },
-                    { 
-                        label: { en: 'B. CSS Variables', id: 'B. CSS Variables' }, 
-                        previewCode: ':root { --primary: #3b82f6; }', 
-                        code: '\n    :root {\n      --primary-color: #3b82f6; /* <--- EDIT */\n      --text-color: #333;\n      --bg-color: #ffffff;\n      --border-color: #ccc;\n    }', 
-                        cssToAdd: '',
-                        correct: true, 
-                        msg: { en: 'Variables declared!', id: 'Variables dideklarasi!' } 
-                    }
+                    { label: { en: 'A. Root Block', id: 'A. Blok Root' }, previewCode: ':root { --main: blue; }', code: ':root {\n      --primary: #2563eb;\n      --bg-color: #ffffff;\n      --text-color: #333333;\n      --card-bg: #ffffff;\n    }\n    /* === AREA CSS KAMU ADA DI BAWAH === */', cssToAdd: '', correct: true, msg: { en: 'Variables declared.', id: 'Variabel dideklarasikan.' } }
                 ]
             },
             {
-                id: 27,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '27. Use Variables', id: '27. Pakai Variables' },
-                desc: { en: 'Replace colors with var().', id: 'Ganti warna dengan var().' },
-                guidance: { en: ['Change .submit-btn background to: var(--primary-color)', 'Try: border: 1px solid var(--border-color);', 'Use var(--text-color) for text.'], id: ['Ubah background .submit-btn jadi: var(--primary-color)', 'Coba: border: 1px solid var(--border-color);', 'Pakai var(--text-color) untuk teks.'] },
-                validation: (code) => /var\(--/i.test(code),
-                successMsg: { en: 'Variables in use!', id: 'Variables dipakai!' }
+                id: 27, chapter: 3, type: 'essay',
+                title: { en: '27. Apply Primary', id: '27. Terapkan Primary' },
+                desc: { en: 'Use --primary on button.', id: 'Gunakan --primary pada tombol.' },
+                guidance: { en: ['Replace background color in .btn with var(--primary).'], id: ['Ganti warna background di .btn dengan var(--primary).'] },
+                validation: (code) => /var\(--primary\)/i.test(code),
+                successMsg: { en: 'Variable used.', id: 'Variabel digunakan.' }
             },
             {
-                id: 28,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '28. More Variables', id: '28. Lebih Banyak Variables' },
-                desc: { en: 'Add spacing and size variables.', id: 'Tambah variables untuk jarak dan ukuran.' },
-                guidance: { en: ['Add to :root: --spacing-lg: 40px;', 'Add --radius: 8px;', 'Add --font-size-base: 16px;'], id: ['Tambah ke :root: --spacing-lg: 40px;', 'Tambah --radius: 8px;', 'Tambah --font-size-base: 16px;'] },
-                validation: (code) => /--spacing|--radius|--font-size/i.test(code),
-                successMsg: { en: 'System variables added!', id: 'System variables ditambah!' }
+                id: 28, chapter: 3, type: 'essay',
+                title: { en: '28. Apply Background', id: '28. Terapkan Background' },
+                desc: { en: 'Use variables for body.', id: 'Gunakan variabel untuk body.' },
+                guidance: { en: ['In body {}, set background-color: var(--bg-color);', 'Set color: var(--text-color);'], id: ['Di body {}, set background-color: var(--bg-color);', 'Set color: var(--text-color);'] },
+                validation: (code) => /var\(--bg-color\)/i.test(code),
+                successMsg: { en: 'Body themed.', id: 'Body bertema.' }
             },
             {
-                id: 29,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '29. Apply Spacing', id: '29. Terapkan Jarak' },
-                desc: { en: 'Use spacing variables.', id: 'Pakai spacing variables.' },
-                guidance: { en: ['Change margin-top: var(--spacing-lg);', 'Use in padding too.', 'Create --spacing-sm: 10px;'], id: ['Ubah margin-top: var(--spacing-lg);', 'Pakai di padding juga.', 'Buat --spacing-sm: 10px;'] },
-                validation: (code) => /var\(--spacing/i.test(code),
-                successMsg: { en: 'Spacing standardized!', id: 'Jarak terstandar!' }
+                id: 29, chapter: 3, type: 'essay',
+                title: { en: '29. New Variable', id: '29. Variabel Baru' },
+                desc: { en: 'Create a secondary color.', id: 'Buat warna sekunder.' },
+                guidance: { en: ['Add --secondary: #64748b; to :root.'], id: ['Tambah --secondary: #64748b; ke :root.'] },
+                validation: (code) => /--secondary:/i.test(code),
+                successMsg: { en: 'Secondary added.', id: 'Secondary ditambahkan.' }
             },
             {
-                id: 30,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '30. Border Radius System', id: '30. Sistem Border Radius' },
-                desc: { en: 'Use radius variable everywhere.', id: 'Pakai variable radius di mana-mana.' },
-                guidance: { en: ['Replace border-radius values with var(--radius).', 'Try creating --radius-lg: 12px;', 'Use in cards, inputs, buttons.'], id: ['Ganti nilai border-radius dengan var(--radius).', 'Coba buat --radius-lg: 12px;', 'Pakai di cards, inputs, buttons.'] },
-                validation: (code) => /var\(--radius/i.test(code),
-                successMsg: { en: 'Radius system active!', id: 'Sistem radius aktif!' }
+                id: 30, chapter: 3, type: 'essay',
+                title: { en: '30. Use Secondary', id: '30. Gunakan Secondary' },
+                desc: { en: 'Apply secondary to footer text.', id: 'Terapkan secondary ke teks footer.' },
+                guidance: { en: ['In .site-footer, change color to var(--secondary).'], id: ['Di .site-footer, ubah color jadi var(--secondary).'] },
+                validation: (code) => /var\(--secondary\)/i.test(code),
+                successMsg: { en: 'Footer themed.', id: 'Footer bertema.' }
             },
             {
-                id: 31,
-                chapter: 3,
-                type: 'choice',
-                title: { en: '31. Dark Mode Prep', id: '31. Persiapan Dark Mode' },
-                desc: { en: 'Prepare for dark mode toggle.', id: 'Persiapkan untuk dark mode toggle.' },
-                targetMarker: ':root {',
+                id: 31, chapter: 3, type: 'choice',
+                title: { en: '31. Dark Mode Block', id: '31. Blok Dark Mode' },
+                desc: { en: 'Inject dark mode query.', id: 'Suntikkan query dark mode.' },
+                targetMarker: '/* === AREA CSS KAMU ADA DI BAWAH === */',
                 options: [
-                    { label: { en: 'A. Separate Files', id: 'A. File Terpisah' }, previewCode: 'dark.css', code: '...', correct: false, msg: { en: 'Keep it in one file!', id: 'Simpan di satu file!' } },
-                    { 
-                        label: { en: 'B. Data Attribute', id: 'B. Data Attribute' }, 
-                        previewCode: '[data-theme="dark"]', 
-                        code: ':root {\n      --primary-color: #3b82f6; /* <--- EDIT */\n      --text-color: #333;\n      --bg-color: #ffffff;\n      --border-color: #ccc;\n      --card-bg: #ffffff;\n    }\n    \n    /* DARK MODE */\n    [data-theme="dark"] {', 
-                        cssToAdd: '\n      --primary-color: #60a5fa;\n      --text-color: #e5e5e5;\n      --bg-color: #1a1a1a;\n      --border-color: #444;\n      --card-bg: #2a2a2a;\n    }',
-                        correct: true, 
-                        msg: { en: 'Dark mode ready!', id: 'Dark mode siap!' } 
-                    }
+                    { label: { en: 'A. Media Prefers-Color', id: 'A. Media Prefers-Color' }, previewCode: '@media (prefers-color-scheme: dark)', code: '\n    @media (prefers-color-scheme: dark) {\n      :root {\n        --bg-color: #1a1a1a;\n        --text-color: #f3f4f6;\n        --card-bg: #2a2a2a;\n        --secondary: #94a3b8;\n      }\n    }', cssToAdd: '', correct: true, msg: { en: 'Dark mode logic added.', id: 'Logika dark mode ditambah.' } }
                 ]
             },
             {
-                id: 32,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '32. Apply Theme Colors', id: '32. Terapkan Warna Tema' },
-                desc: { en: 'Use theme variables in body and cards.', id: 'Pakai theme variables di body dan cards.' },
-                guidance: { en: ['body { background-color: var(--bg-color); color: var(--text-color); }', 'Update .card background to var(--card-bg).', 'Check all elements use variables.'], id: ['body { background-color: var(--bg-color); color: var(--text-color); }', 'Update background .card jadi var(--card-bg).', 'Cek semua elemen pakai variables.'] },
-                validation: (code) => /var\(--bg-color\)|var\(--text-color\)/i.test(code),
-                successMsg: { en: 'Theme colors applied!', id: 'Warna tema diterapkan!' }
+                id: 32, chapter: 3, type: 'essay',
+                title: { en: '32. Card Theme', id: '32. Tema Kartu' },
+                desc: { en: 'Ensure cards use variable.', id: 'Pastikan kartu pakai variabel.' },
+                guidance: { en: ['Change .card background to var(--card-bg).', 'Change color to var(--text-color).'], id: ['Ubah background .card jadi var(--card-bg).', 'Ubah color jadi var(--text-color).'] },
+                validation: (code) => /var\(--card-bg\)/i.test(code),
+                successMsg: { en: 'Cards adaptive.', id: 'Kartu adaptif.' }
             },
             {
-                id: 33,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '33. Dark Borders', id: '33. Border Gelap' },
-                desc: { en: 'Update borders with theme variable.', id: 'Update border dengan theme variable.' },
-                guidance: { en: ['Find all "border: 1px solid #ccc".', 'Replace with var(--border-color).', 'Check menu-box, inputs, cards.'], id: ['Cari semua "border: 1px solid #ccc".', 'Ganti dengan var(--border-color).', 'Cek menu-box, inputs, cards.'] },
-                validation: (code) => /var\(--border-color\)/i.test(code),
-                successMsg: { en: 'Borders themed!', id: 'Border sudah tema!' }
+                id: 33, chapter: 3, type: 'essay',
+                title: { en: '33. Form Theme', id: '33. Tema Form' },
+                desc: { en: 'Fix form inputs for dark mode.', id: 'Perbaiki input form untuk dark mode.' },
+                guidance: { en: ['In .inp, add background: var(--card-bg);', 'Add color: var(--text-color);'], id: ['Di .inp, tambah background: var(--card-bg);', 'Tambah color: var(--text-color);'] },
+                validation: (code) => /\.inp[\s\S]*var\(--card-bg\)/i.test(code),
+                successMsg: { en: 'Inputs adaptive.', id: 'Input adaptif.' }
             },
             {
-                id: 34,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '34. Color Contrast', id: '34. Kontras Warna' },
-                desc: { en: 'Improve dark mode contrast.', id: 'Tingkatkan kontras dark mode.' },
-                guidance: { en: ['In [data-theme="dark"], make --text-color lighter (#f5f5f5).', 'Adjust --border-color to #555.', 'Test readability.'], id: ['Di [data-theme="dark"], buat --text-color lebih terang (#f5f5f5).', 'Sesuaikan --border-color jadi #555.', 'Test keterbacaan.'] },
-                validation: (code) => /data-theme.*dark/is.test(code),
-                successMsg: { en: 'Contrast improved!', id: 'Kontras ditingkatkan!' }
+                id: 34, chapter: 3, type: 'essay',
+                title: { en: '34. Link Theme', id: '34. Tema Link' },
+                desc: { en: 'Nav links need variables.', id: 'Link nav butuh variabel.' },
+                guidance: { en: ['Change .menu-box a color to var(--text-color).'], id: ['Ubah color .menu-box a jadi var(--text-color).'] },
+                validation: (code) => /menu-box[\s\S]*var\(--text-color\)/i.test(code),
+                successMsg: { en: 'Nav adaptive.', id: 'Nav adaptif.' }
             },
             {
-                id: 35,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '35. Secondary Color', id: '35. Warna Sekunder' },
-                desc: { en: 'Add secondary color variable.', id: 'Tambah variable warna sekunder.' },
-                guidance: { en: ['Add --secondary-color: #8b5cf6; to :root.', 'Add dark version: #a78bfa;', 'Use for accents.'], id: ['Tambah --secondary-color: #8b5cf6; ke :root.', 'Tambah versi dark: #a78bfa;', 'Pakai untuk aksen.'] },
-                validation: (code) => /--secondary-color/i.test(code),
-                successMsg: { en: 'Secondary color added!', id: 'Warna sekunder ditambah!' }
+                id: 35, chapter: 3, type: 'essay',
+                title: { en: '35. Radius Variable', id: '35. Variabel Radius' },
+                desc: { en: 'Standardize corners.', id: 'Standarisasi sudut.' },
+                guidance: { en: ['Add --radius: 8px; to :root.', 'Use var(--radius) in .card and .btn.'], id: ['Tambah --radius: 8px; ke :root.', 'Gunakan var(--radius) di .card dan .btn.'] },
+                validation: (code) => /--radius:/i.test(code),
+                successMsg: { en: 'Radius standardized.', id: 'Radius standar.' }
             },
             {
-                id: 36,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '36. Shadow Variables', id: '36. Variable Shadow' },
-                desc: { en: 'Create shadow system.', id: 'Buat sistem shadow.' },
-                guidance: { en: ['Add --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);', 'Add --shadow-md: 0 4px 6px rgba(0,0,0,0.1);', 'Use in cards and buttons.'], id: ['Tambah --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);', 'Tambah --shadow-md: 0 4px 6px rgba(0,0,0,0.1);', 'Pakai di cards dan buttons.'] },
-                validation: (code) => /--shadow/i.test(code),
-                successMsg: { en: 'Shadow system ready!', id: 'Sistem shadow siap!' }
+                id: 36, chapter: 3, type: 'essay',
+                title: { en: '36. Spacing Variable', id: '36. Variabel Spacing' },
+                desc: { en: 'Standardize gaps.', id: 'Standarisasi jarak.' },
+                guidance: { en: ['Add --spacing: 20px; to :root.', 'Use var(--spacing) in .grid-box gap.'], id: ['Tambah --spacing: 20px; ke :root.', 'Gunakan var(--spacing) di gap .grid-box.'] },
+                validation: (code) => /--spacing:/i.test(code),
+                successMsg: { en: 'Spacing standardized.', id: 'Jarak standar.' }
             },
             {
-                id: 37,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '37. Apply Shadows', id: '37. Terapkan Shadow' },
-                desc: { en: 'Use shadow variables.', id: 'Pakai shadow variables.' },
-                guidance: { en: ['card { box-shadow: var(--shadow-md); }', 'Try on .contact-form too.', 'Dark mode: lighter shadows.'], id: ['card { box-shadow: var(--shadow-md); }', 'Coba di .contact-form juga.', 'Dark mode: shadow lebih terang.'] },
-                validation: (code) => /var\(--shadow/i.test(code),
-                successMsg: { en: 'Shadows applied!', id: 'Shadow diterapkan!' }
+                id: 37, chapter: 3, type: 'essay',
+                title: { en: '37. Hero Dark Fix', id: '37. Fix Hero Dark' },
+                desc: { en: 'Hero background is static. Fix it.', id: 'Background Hero statis. Perbaiki.' },
+                guidance: { en: ['Create --hero-bg: #f3f4f6; in root.', 'In dark media query: --hero-bg: #333;', 'Use var(--hero-bg) in .hero.'], id: ['Buat --hero-bg: #f3f4f6; di root.', 'Di dark media query: --hero-bg: #333;', 'Gunakan var(--hero-bg) di .hero.'] },
+                validation: (code) => /--hero-bg:/i.test(code),
+                successMsg: { en: 'Hero adaptive.', id: 'Hero adaptif.' }
             },
             {
-                id: 38,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '38. Typography Scale', id: '38. Skala Tipografi' },
-                desc: { en: 'Create typography system.', id: 'Buat sistem tipografi.' },
-                guidance: { en: ['Add --text-xs: 0.75rem;', '--text-sm: 0.875rem;', '--text-base: 1rem;', '--text-lg: 1.25rem;'], id: ['Tambah --text-xs: 0.75rem;', '--text-sm: 0.875rem;', '--text-base: 1rem;', '--text-lg: 1.25rem;'] },
-                validation: (code) => /--text-(xs|sm|base|lg)/i.test(code),
-                successMsg: { en: 'Typography scale added!', id: 'Skala tipografi ditambah!' }
+                id: 38, chapter: 3, type: 'essay',
+                title: { en: '38. Accent Color', id: '38. Warna Aksen' },
+                desc: { en: 'Change primary color.', id: 'Ubah warna utama.' },
+                guidance: { en: ['Change --primary in :root to #059669 (Emerald).'], id: ['Ubah --primary di :root jadi #059669 (Emerald).'] },
+                validation: (code) => /#059669/i.test(code),
+                successMsg: { en: 'Rebranded!', id: 'Rebranding!' }
             },
             {
-                id: 39,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '39. Use Typography', id: '39. Pakai Tipografi' },
-                desc: { en: 'Apply typography variables.', id: 'Terapkan typography variables.' },
-                guidance: { en: ['body { font-size: var(--text-base); }', 'h2 { font-size: var(--text-lg); }', 'Small text: var(--text-sm);'], id: ['body { font-size: var(--text-base); }', 'h2 { font-size: var(--text-lg); }', 'Teks kecil: var(--text-sm);'] },
-                validation: (code) => /var\(--text-(base|lg|sm)/i.test(code),
-                successMsg: { en: 'Typography applied!', id: 'Tipografi diterapkan!' }
+                id: 39, chapter: 3, type: 'essay',
+                title: { en: '39. Dark Accent', id: '39. Aksen Gelap' },
+                desc: { en: 'Adjust primary for dark mode.', id: 'Sesuaikan primary untuk dark mode.' },
+                guidance: { en: ['In dark media query, set --primary: #34d399 (Lighter green).'], id: ['Di dark media query, set --primary: #34d399 (Hijau terang).'] },
+                validation: (code) => /#34d399/i.test(code),
+                successMsg: { en: 'Contrast fixed.', id: 'Kontras diperbaiki.' }
             },
             {
-                id: 40,
-                chapter: 3,
-                type: 'essay',
-                title: { en: '40. Chapter 3 Complete!', id: '40. Bab 3 Selesai!' },
-                desc: { en: 'Theme system complete! Ready for advanced grids.', id: 'Sistem tema selesai! Siap untuk grid lanjutan.' },
-                guidance: { en: ['Test switching data-theme in HTML.', 'All colors should adapt.', 'Ready for complex layouts!'], id: ['Test ganti data-theme di HTML.', 'Semua warna harus adaptif.', 'Siap untuk layout kompleks!'] },
+                id: 40, chapter: 3, type: 'essay',
+                title: { en: '40. Chapter 3 Review', id: '40. Review Bab 3' },
+                desc: { en: 'System check.', id: 'Cek sistem.' },
+                guidance: { en: ['Verify variables work.', 'Save to continue.'], id: ['Verifikasi variabel berjalan.', 'Simpan untuk lanjut.'] },
                 validation: (code) => true,
-                successMsg: { en: 'Chapter 3 Complete! 🌓', id: 'Bab 3 Selesai! 🌓' }
+                successMsg: { en: 'Chapter 3 Done!', id: 'Bab 3 Selesai!' }
             },
 
             // ========================================
             // CHAPTER 4: ADVANCED GRID (41-60)
             // ========================================
             {
-                id: 41,
-                chapter: 4,
-                type: 'choice',
-                title: { en: '41. Grid Areas Intro', id: '41. Pengenalan Grid Areas' },
-                desc: { en: 'Learn named grid areas.', id: 'Pelajari named grid areas.' },
-                targetMarker: '<!-- STEP_5_FOOTER -->',
+                id: 41, chapter: 4, type: 'choice',
+                title: { en: '41. Grid Areas', id: '41. Grid Areas' },
+                desc: { en: 'Inject named grid layout.', id: 'Suntikkan layout named grid.' },
+                targetMarker: '',
                 options: [
-                    { label: { en: 'A. Simple Grid', id: 'A. Grid Sederhana' }, previewCode: 'grid-template-columns: 1fr 1fr;', code: '...', correct: false, msg: { en: 'We need areas!', id: 'Kita butuh areas!' } },
-                    { 
-                        label: { en: 'B. Named Areas', id: 'B. Named Areas' }, 
-                        previewCode: 'grid-template-areas: "header header"', 
-                        code: '<section class="bento-grid">\n      <div class="bento-item item-a">A</div>\n      <div class="bento-item item-b">B</div>\n      <div class="bento-item item-c">C</div>\n    </section>\n    <!-- STEP_5_FOOTER -->', 
-                        cssToAdd: '\n    .bento-grid {\n      display: grid;\n      grid-template-columns: 1fr 1fr; /* <--- EDIT */\n      grid-template-areas:\n        "a a"\n        "b c";\n      gap: 15px;\n      margin-top: 30px;\n    }\n    .bento-item { background: var(--card-bg); padding: 30px; border-radius: var(--radius); border: 1px solid var(--border-color); }\n    .item-a { grid-area: a; }\n    .item-b { grid-area: b; }\n    .item-c { grid-area: c; }',
-                        correct: true, 
-                        msg: { en: 'Grid areas set!', id: 'Grid areas diatur!' } 
-                    }
+                    { label: { en: 'A. Bento Grid', id: 'A. Bento Grid' }, previewCode: 'grid-template-areas: ...', code: '<div class="bento-grid">\n      <div class="box box-1">Main</div>\n      <div class="box box-2">Side</div>\n      <div class="box box-3">Bottom</div>\n    </div>', cssToAdd: '\n    .bento-grid {\n      display: grid;\n      grid-template-columns: 2fr 1fr;\n      grid-template-rows: 200px 150px;\n      grid-template-areas:\n        "header sidebar"\n        "footer footer";\n      gap: 15px;\n      margin-top: 30px;\n    }\n    .box { background: var(--card-bg); border: 1px solid #ccc; padding: 20px; border-radius: var(--radius); }\n    .box-1 { grid-area: header; }\n    .box-2 { grid-area: sidebar; }\n    .box-3 { grid-area: footer; }', correct: true, msg: { en: 'Bento injected.', id: 'Bento ditambahkan.' } }
                 ]
             },
             {
-                id: 42,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '42. Modify Areas', id: '42. Ubah Area' },
-                desc: { en: 'Change grid area layout.', id: 'Ubah layout grid area.' },
-                guidance: { en: ['Try: "a b" / "a c" (A takes left column).', 'Try: "a a" / "b b" / "c c" (stack).', 'Experiment with layouts!'], id: ['Coba: "a b" / "a c" (A ambil kolom kiri).', 'Coba: "a a" / "b b" / "c c" (stack).', 'Eksperimen dengan layout!'] },
-                validation: (code) => /grid-template-areas/i.test(code),
-                successMsg: { en: 'Layout changed!', id: 'Layout diubah!' }
+                id: 42, chapter: 4, type: 'essay',
+                title: { en: '42. Edit Areas', id: '42. Edit Areas' },
+                desc: { en: 'Change the layout structure.', id: 'Ubah struktur layout.' },
+                guidance: { en: ['Change grid-template-areas to "header header" "sidebar footer".', 'Watch layout shift.'], id: ['Ubah grid-template-areas jadi "header header" "sidebar footer".', 'Lihat layout berubah.'] },
+                validation: (code) => /"header\s+header"/i.test(code),
+                successMsg: { en: 'Layout shifted.', id: 'Layout berubah.' }
             },
             {
-                id: 43,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '43. Add More Items', id: '43. Tambah Item' },
-                desc: { en: 'Add item D to the grid.', id: 'Tambah item D ke grid.' },
-                guidance: { en: ['Add <div class="bento-item item-d">D</div> in HTML.', 'Add .item-d { grid-area: d; }', 'Update grid-template-areas to include d.'], id: ['Tambah <div class="bento-item item-d">D</div> di HTML.', 'Tambah .item-d { grid-area: d; }', 'Update grid-template-areas sertakan d.'] },
-                validation: (code) => /item-d|grid-area:\s*d/i.test(code),
-                successMsg: { en: 'Item D added!', id: 'Item D ditambah!' }
+                id: 43, chapter: 4, type: 'choice',
+                title: { en: '43. Add Grid Item', id: '43. Tambah Item Grid' },
+                desc: { en: 'Inject a 4th box.', id: 'Suntikkan kotak ke-4.' },
+                targetMarker: '<div class="box box-3">Bottom</div>',
+                options: [
+                    { label: { en: 'A. Box 4', id: 'A. Kotak 4' }, previewCode: '<div class="box box-4">', code: '<div class="box box-3">Bottom</div>\n      <div class="box box-4">Extra</div>', cssToAdd: '\n    .box-4 { grid-area: extra; background: #e0f2fe; }', correct: true, msg: { en: 'Box 4 added.', id: 'Kotak 4 ditambah.' } }
+                ]
             },
             {
-                id: 44,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '44. Three Columns', id: '44. Tiga Kolom' },
-                desc: { en: 'Make grid 3 columns.', id: 'Buat grid 3 kolom.' },
-                guidance: { en: ['Change grid-template-columns: 1fr 1fr 1fr;', 'Adjust template-areas: "a a b" / "c c d";', 'Try different combinations.'], id: ['Ubah grid-template-columns: 1fr 1fr 1fr;', 'Sesuaikan template-areas: "a a b" / "c c d";', 'Coba kombinasi berbeda.'] },
-                validation: (code) => /1fr\s+1fr\s+1fr/i.test(code),
-                successMsg: { en: '3 columns set!', id: '3 kolom diatur!' }
+                id: 44, chapter: 4, type: 'essay',
+                title: { en: '44. Assign Area', id: '44. Tetapkan Area' },
+                desc: { en: 'Place Box 4 in grid.', id: 'Tempatkan Kotak 4 di grid.' },
+                guidance: { en: ['Update grid-template-areas to: "header header" "sidebar extra" "footer footer".'], id: ['Update grid-template-areas jadi: "header header" "sidebar extra" "footer footer".'] },
+                validation: (code) => /header\s+header/i.test(code) && /sidebar\s+extra/i.test(code),
+                successMsg: { en: 'Area assigned.', id: 'Area ditetapkan.' }
             },
             {
-                id: 45,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '45. Asymmetric Layout', id: '45. Layout Asimetris' },
-                desc: { en: 'Create asymmetric column widths.', id: 'Buat lebar kolom asimetris.' },
-                guidance: { en: ['Try: grid-template-columns: 2fr 1fr;', 'Or: 1fr 2fr 1fr;', 'Combine with different areas.'], id: ['Coba: grid-template-columns: 2fr 1fr;', 'Atau: 1fr 2fr 1fr;', 'Kombinasikan dengan area berbeda.'] },
-                validation: (code) => /2fr|1fr\s+2fr|2fr\s+1fr/i.test(code),
-                successMsg: { en: 'Asymmetric layout!', id: 'Layout asimetris!' }
+                id: 45, chapter: 4, type: 'essay',
+                title: { en: '45. Column Widths', id: '45. Lebar Kolom' },
+                desc: { en: 'Adjust column ratio.', id: 'Sesuaikan rasio kolom.' },
+                guidance: { en: ['Change grid-template-columns to: 1fr 1fr; (Equal width).'], id: ['Ubah grid-template-columns jadi: 1fr 1fr; (Lebar sama).'] },
+                validation: (code) => /1fr\s+1fr/i.test(code),
+                successMsg: { en: 'Columns equalized.', id: 'Kolom disamakan.' }
             },
             {
-                id: 46,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '46. Gap Adjustment', id: '46. Sesuaikan Gap' },
-                desc: { en: 'Control grid gaps.', id: 'Kontrol jarak grid.' },
-                guidance: { en: ['Change gap to 20px.', 'Try row-gap and column-gap separately.', 'Use variables: var(--spacing-sm).'], id: ['Ubah gap jadi 20px.', 'Coba row-gap dan column-gap terpisah.', 'Pakai variables: var(--spacing-sm).'] },
-                validation: (code) => /gap:\s*(?!15px)|row-gap|column-gap/i.test(code),
-                successMsg: { en: 'Gaps adjusted!', id: 'Gap disesuaikan!' }
+                id: 46, chapter: 4, type: 'essay',
+                title: { en: '46. Gap Control', id: '46. Kontrol Jarak' },
+                desc: { en: 'Tighten the layout.', id: 'Rapatkan layout.' },
+                guidance: { en: ['Change gap to 10px.'], id: ['Ubah gap jadi 10px.'] },
+                validation: (code) => /gap:\s*10px/i.test(code),
+                successMsg: { en: 'Gap tightened.', id: 'Jarak dirapatkan.' }
             },
             {
-                id: 47,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '47. Bento Styling', id: '47. Gaya Bento' },
-                desc: { en: 'Style bento items uniquely.', id: 'Beri gaya unik pada item bento.' },
-                guidance: { en: ['Add different backgrounds to items.', 'Try: .item-a { background: linear-gradient(...); }', 'Add min-height: 150px;'], id: ['Tambah background berbeda ke items.', 'Coba: .item-a { background: linear-gradient(...); }', 'Tambah min-height: 150px;'] },
-                validation: (code) => /linear-gradient|min-height/i.test(code),
-                successMsg: { en: 'Bento styled!', id: 'Bento diberi gaya!' }
+                id: 47, chapter: 4, type: 'essay',
+                title: { en: '47. Row Height', id: '47. Tinggi Baris' },
+                desc: { en: 'Make rows taller.', id: 'Buat baris lebih tinggi.' },
+                guidance: { en: ['Change grid-template-rows to: 250px 200px auto;'], id: ['Ubah grid-template-rows jadi: 250px 200px auto;'] },
+                validation: (code) => /250px/i.test(code),
+                successMsg: { en: 'Rows adjusted.', id: 'Baris disesuaikan.' }
             },
             {
-                id: 48,
-                chapter: 4,
-                type: 'essay',
+                id: 48, chapter: 4, type: 'choice',
                 title: { en: '48. Nested Grid', id: '48. Grid Bersarang' },
-                desc: { en: 'Create grid inside an item.', id: 'Buat grid di dalam item.' },
-                guidance: { en: ['Inside item-a, add: display: grid;', 'Add grid-template-columns: 1fr 1fr;', 'Put content in divs.'], id: ['Di dalam item-a, tambah: display: grid;', 'Tambah grid-template-columns: 1fr 1fr;', 'Taruh konten di divs.'] },
-                validation: (code) => /item-a[\s\S]*display:\s*grid/i.test(code),
-                successMsg: { en: 'Nested grid created!', id: 'Grid bersarang dibuat!' }
+                desc: { en: 'Turn Box 1 into a grid.', id: 'Ubah Box 1 jadi grid.' },
+                targetMarker: '<div class="box box-1">Main</div>',
+                options: [
+                    { label: { en: 'A. Nested Structure', id: 'A. Struktur Bersarang' }, previewCode: 'display: grid inside box', code: '<div class="box box-1 nested-parent">\n        <div>Item A</div>\n        <div>Item B</div>\n      </div>', cssToAdd: '\n    .nested-parent { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }', correct: true, msg: { en: 'Nesting complete.', id: 'Nesting selesai.' } }
+                ]
             },
             {
-                id: 49,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '49. Auto-fit Magic', id: '49. Magic Auto-fit' },
-                desc: { en: 'Use auto-fit for responsive grid.', id: 'Pakai auto-fit untuk grid responsif.' },
-                guidance: { en: ['Try: grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));', 'Remove explicit areas for this test.', 'Watch it adapt!'], id: ['Coba: grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));', 'Hapus areas eksplisit untuk test.', 'Lihat adaptasinya!'] },
-                validation: (code) => /auto-fit|repeat.*minmax/i.test(code),
-                successMsg: { en: 'Auto-fit works!', id: 'Auto-fit jalan!' }
+                id: 49, chapter: 4, type: 'essay',
+                title: { en: '49. Nested Style', id: '49. Gaya Bersarang' },
+                desc: { en: 'Style inner items.', id: 'Gaya item dalam.' },
+                guidance: { en: ['Add background color to inner divs of .nested-parent (use simple CSS selector like .nested-parent div { bg: #eee }).'], id: ['Beri background div dalam .nested-parent (pakai selector .nested-parent div { bg: #eee }).'] },
+                validation: (code) => /\.nested-parent\s+div/i.test(code),
+                successMsg: { en: 'Inner items styled.', id: 'Item dalam digayakan.' }
             },
             {
-                id: 50,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '50. Grid Alignment', id: '50. Alignment Grid' },
-                desc: { en: 'Align items in grid.', id: 'Sejajarkan item di grid.' },
-                guidance: { en: ['Add align-items: center;', 'Try justify-items: center;', 'Or place-items: center;'], id: ['Tambah align-items: center;', 'Coba justify-items: center;', 'Atau place-items: center;'] },
-                validation: (code) => /align-items|justify-items|place-items/i.test(code),
-                successMsg: { en: 'Items aligned!', id: 'Item disejajarkan!' }
+                id: 50, chapter: 4, type: 'essay',
+                title: { en: '50. Alignment', id: '50. Perataan' },
+                desc: { en: 'Center content in grid items.', id: 'Tengahkan konten item grid.' },
+                guidance: { en: ['Add align-items: center; justify-items: center; to .bento-grid.'], id: ['Tambah align-items: center; justify-items: center; ke .bento-grid.'] },
+                validation: (code) => /align-items:\s*center/i.test(code),
+                successMsg: { en: 'Centered.', id: 'Ditengahkan.' }
             },
             {
-                id: 51,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '51. Dense Packing', id: '51. Packing Dense' },
-                desc: { en: 'Use grid-auto-flow dense.', id: 'Pakai grid-auto-flow dense.' },
-                guidance: { en: ['Add grid-auto-flow: dense;', 'Watch items fill gaps.', 'Useful for masonry-like layouts.'], id: ['Tambah grid-auto-flow: dense;', 'Lihat item mengisi celah.', 'Berguna untuk layout masonry.'] },
-                validation: (code) => /grid-auto-flow:\s*dense/i.test(code),
-                successMsg: { en: 'Dense packing enabled!', id: 'Dense packing aktif!' }
+                id: 51, chapter: 4, type: 'essay',
+                title: { en: '51. Stretch', id: '51. Stretch' },
+                desc: { en: 'Make items fill space.', id: 'Buat item isi ruang.' },
+                guidance: { en: ['Remove align-items/justify-items or set to "stretch".'], id: ['Hapus align-items/justify-items atau set ke "stretch".'] },
+                validation: (code) => !/align-items:\s*center/i.test(code) || /stretch/i.test(code),
+                successMsg: { en: 'Stretched.', id: 'Di-stretch.' }
             },
             {
-                id: 52,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '52. Span Control', id: '52. Kontrol Span' },
-                desc: { en: 'Use grid-column and grid-row.', id: 'Pakai grid-column dan grid-row.' },
-                guidance: { en: ['Try: .item-a { grid-column: span 2; }', 'Or: grid-row: span 2;', 'Control item size directly.'], id: ['Coba: .item-a { grid-column: span 2; }', 'Atau: grid-row: span 2;', 'Kontrol ukuran item langsung.'] },
-                validation: (code) => /grid-(column|row):\s*span/i.test(code),
-                successMsg: { en: 'Span controls added!', id: 'Kontrol span ditambah!' }
+                id: 52, chapter: 4, type: 'choice',
+                title: { en: '52. Auto-Fill', id: '52. Auto-Fill' },
+                desc: { en: 'Inject responsive columns.', id: 'Suntik kolom responsif.' },
+                targetMarker: 'grid-template-columns: 1fr 1fr;',
+                options: [
+                    { label: { en: 'A. Repeat Auto-Fill', id: 'A. Repeat Auto-Fill' }, previewCode: 'repeat(auto-fill, ...)', code: 'grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));', cssToAdd: '', correct: true, msg: { en: 'Auto-fill active.', id: 'Auto-fill aktif.' } }
+                ]
             },
             {
-                id: 53,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '53. Named Lines', id: '53. Named Lines' },
-                desc: { en: 'Create named grid lines.', id: 'Buat named grid lines.' },
-                guidance: { en: ['Try: grid-template-columns: [start] 1fr [middle] 1fr [end];', 'Use in items: grid-column: start / middle;', 'Powerful for complex layouts.'], id: ['Coba: grid-template-columns: [start] 1fr [middle] 1fr [end];', 'Pakai di items: grid-column: start / middle;', 'Powerful untuk layout kompleks.'] },
-                validation: (code) => /\[start\]|\[middle\]|\[end\]/i.test(code),
-                successMsg: { en: 'Named lines created!', id: 'Named lines dibuat!' }
+                id: 53, chapter: 4, type: 'essay',
+                title: { en: '53. MinMax Tweak', id: '53. Tweak MinMax' },
+                desc: { en: 'Adjust minimum width.', id: 'Sesuaikan lebar minimum.' },
+                guidance: { en: ['Change minmax(100px) to minmax(150px).'], id: ['Ubah minmax(100px) jadi minmax(150px).'] },
+                validation: (code) => /150px/i.test(code),
+                successMsg: { en: 'Minmax adjusted.', id: 'Minmax disesuaikan.' }
             },
             {
-                id: 54,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '54. Magazine Layout', id: '54. Layout Majalah' },
-                desc: { en: 'Create magazine-style grid.', id: 'Buat grid gaya majalah.' },
-                guidance: { en: ['Use areas to make: header spans full, sidebar on right, main content left.', 'Try: "h h h" / "m m s" / "m m s"', 'Experiment!'], id: ['Pakai areas buat: header penuh, sidebar kanan, konten utama kiri.', 'Coba: "h h h" / "m m s" / "m m s"', 'Eksperimen!'] },
-                validation: (code) => /grid-template-areas.*".*h.*h.*h"/is.test(code),
-                successMsg: { en: 'Magazine layout!', id: 'Layout majalah!' }
+                id: 54, chapter: 4, type: 'essay',
+                title: { en: '54. Implicit Rows', id: '54. Baris Implisit' },
+                desc: { en: 'Control auto-created rows.', id: 'Kontrol baris otomatis.' },
+                guidance: { en: ['Add grid-auto-rows: 150px; to .bento-grid.'], id: ['Tambah grid-auto-rows: 150px; ke .bento-grid.'] },
+                validation: (code) => /grid-auto-rows:/i.test(code),
+                successMsg: { en: 'Auto rows set.', id: 'Baris otomatis diatur.' }
             },
             {
-                id: 55,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '55. Grid Item Order', id: '55. Urutan Item Grid' },
+                id: 55, chapter: 4, type: 'essay',
+                title: { en: '55. Order Property', id: '55. Properti Order' },
                 desc: { en: 'Change visual order.', id: 'Ubah urutan visual.' },
-                guidance: { en: ['Add order property: .item-c { order: -1; }', 'Changes visual position.', 'HTML order stays same.'], id: ['Tambah property order: .item-c { order: -1; }', 'Ubah posisi visual.', 'Urutan HTML tetap sama.'] },
-                validation: (code) => /order:\s*-?\d/i.test(code),
-                successMsg: { en: 'Order changed!', id: 'Urutan diubah!' }
+                guidance: { en: ['Add order: -1; to .box-4.', 'It moves to first position.'], id: ['Tambah order: -1; ke .box-4.', 'Pindah ke posisi pertama.'] },
+                validation: (code) => /order:\s*-1/i.test(code),
+                successMsg: { en: 'Reordered.', id: 'Diurutkan ulang.' }
             },
             {
-                id: 56,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '56. Min-Max Columns', id: '56. Kolom Min-Max' },
-                desc: { en: 'Use minmax() function.', id: 'Pakai fungsi minmax().' },
-                guidance: { en: ['Try: grid-template-columns: minmax(200px, 1fr) 2fr;', 'First column: min 200px, max 1fr.', 'Flexible but controlled.'], id: ['Coba: grid-template-columns: minmax(200px, 1fr) 2fr;', 'Kolom pertama: min 200px, max 1fr.', 'Fleksibel tapi terkontrol.'] },
-                validation: (code) => /minmax\(/i.test(code),
-                successMsg: { en: 'Minmax applied!', id: 'Minmax diterapkan!' }
+                id: 56, chapter: 4, type: 'essay',
+                title: { en: '56. Z-Index Grid', id: '56. Z-Index Grid' },
+                desc: { en: 'Overlap items.', id: 'Tumpuk item.' },
+                guidance: { en: ['Set .box-1 margin-right: -20px; z-index: 10;', 'Overlaps next item.'], id: ['Set .box-1 margin-right: -20px; z-index: 10;', 'Menumpuk item berikutnya.'] },
+                validation: (code) => /z-index:/i.test(code),
+                successMsg: { en: 'Overlapped.', id: 'Ditumpuk.' }
             },
             {
-                id: 57,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '57. Grid Gap Colors', id: '57. Warna Gap Grid' },
-                desc: { en: 'Fake colored gaps with background.', id: 'Buat gap berwarna dengan background.' },
-                guidance: { en: ['Set grid background-color.', 'Make items have opaque backgrounds.', 'Gap shows grid background.'], id: ['Set background-color grid.', 'Buat items punya background opak.', 'Gap tunjukkan background grid.'] },
-                validation: (code) => /bento-grid[\s\S]*background/i.test(code),
-                successMsg: { en: 'Colored gaps!', id: 'Gap berwarna!' }
+                id: 57, chapter: 4, type: 'choice',
+                title: { en: '57. Grid Line Names', id: '57. Nama Garis Grid' },
+                desc: { en: 'Inject named lines definition.', id: 'Suntik definisi nama garis.' },
+                targetMarker: 'grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));',
+                options: [
+                    { label: { en: 'A. Line Names', id: 'A. Nama Garis' }, previewCode: '[start] 1fr [end]', code: 'grid-template-columns: [main-start] 1fr [center] 1fr [main-end];', cssToAdd: '', correct: true, msg: { en: 'Lines named.', id: 'Garis dinamai.' } }
+                ]
             },
             {
-                id: 58,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '58. Holy Grail Layout', id: '58. Layout Holy Grail' },
-                desc: { en: 'Classic layout with grid.', id: 'Layout klasik dengan grid.' },
-                guidance: { en: ['Areas: header (full), nav (left), main (center), aside (right), footer (full).', '"h h h" / "n m a" / "f f f"', 'Classic 3-column.'], id: ['Areas: header (penuh), nav (kiri), main (tengah), aside (kanan), footer (penuh).', '"h h h" / "n m a" / "f f f"', 'Klasik 3-kolom.'] },
-                validation: (code) => /grid-template-areas/i.test(code),
-                successMsg: { en: 'Holy Grail achieved!', id: 'Holy Grail tercapai!' }
+                id: 58, chapter: 4, type: 'essay',
+                title: { en: '58. Use Lines', id: '58. Pakai Garis' },
+                desc: { en: 'Position using names.', id: 'Posisikan pakai nama.' },
+                guidance: { en: ['Set .box-1 grid-column: main-start / main-end;'], id: ['Set .box-1 grid-column: main-start / main-end;'] },
+                validation: (code) => /main-start/i.test(code),
+                successMsg: { en: 'Positioned by name.', id: 'Diposisikan via nama.' }
             },
             {
-                id: 59,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '59. Grid Item Positioning', id: '59. Posisi Item Grid' },
-                desc: { en: 'Place items with line numbers.', id: 'Tempatkan item dengan nomor baris.' },
-                guidance: { en: ['Try: grid-column: 1 / 3; (span columns 1-3)', 'Try: grid-row: 2 / 4;', 'Precise control.'], id: ['Coba: grid-column: 1 / 3; (span kolom 1-3)', 'Coba: grid-row: 2 / 4;', 'Kontrol presisi.'] },
-                validation: (code) => /grid-(column|row):\s*\d+\s*\/\s*\d+/i.test(code),
-                successMsg: { en: 'Positioned precisely!', id: 'Diposisikan presisi!' }
+                id: 59, chapter: 4, type: 'essay',
+                title: { en: '59. Dense Flow', id: '59. Aliran Dense' },
+                desc: { en: 'Pack items tightly.', id: 'Padatkan item.' },
+                guidance: { en: ['Add grid-auto-flow: dense; to container.'], id: ['Tambah grid-auto-flow: dense; ke container.'] },
+                validation: (code) => /dense/i.test(code),
+                successMsg: { en: 'Dense flow active.', id: 'Dense flow aktif.' }
             },
             {
-                id: 60,
-                chapter: 4,
-                type: 'essay',
-                title: { en: '60. Chapter 4 Complete!', id: '60. Bab 4 Selesai!' },
-                desc: { en: 'Grid mastery! Ready for responsive design.', id: 'Grid dikuasai! Siap untuk desain responsif.' },
-                guidance: { en: ['Create your favorite grid layout.', 'Test different area arrangements.', 'Ready for media queries!'], id: ['Buat layout grid favoritmu.', 'Test pengaturan area berbeda.', 'Siap untuk media queries!'] },
-                validation: (code) => true,
-                successMsg: { en: 'Chapter 4 Complete! 📐', id: 'Bab 4 Selesai! 📐' }
+                id: 60, chapter: 4, type: 'essay',
+                title: { en: '60. Clean Up', id: '60. Bersih-bersih' },
+                desc: { en: 'Reset grid for Chapter 5.', id: 'Reset grid untuk Bab 5.' },
+                guidance: { en: ['Set grid-template-columns: 1fr 1fr;', 'Remove complex areas/ordering.'], id: ['Set grid-template-columns: 1fr 1fr;', 'Hapus area/ordering kompleks.'] },
+                validation: (code) => /1fr\s+1fr/i.test(code),
+                successMsg: { en: 'Grid Reset.', id: 'Grid Direset.' }
             },
 
             // ========================================
-            // CHAPTER 5: RESPONSIVE DESIGN (61-80)
+            // CHAPTER 5: RESPONSIVE (61-80)
             // ========================================
             {
-                id: 61,
-                chapter: 5,
-                type: 'choice',
-                title: { en: '61. Media Queries Intro', id: '61. Pengenalan Media Queries' },
-                desc: { en: 'Make design responsive.', id: 'Buat desain responsif.' },
+                id: 61, chapter: 5, type: 'choice',
+                title: { en: '61. Mobile Query', id: '61. Mobile Query' },
+                desc: { en: 'Inject Media Query block.', id: 'Suntik blok Media Query.' },
                 targetMarker: '/* === AREA CSS KAMU ADA DI BAWAH === */',
                 options: [
-                    { label: { en: 'A. Desktop Only', id: 'A. Desktop Saja' }, previewCode: 'width: 1200px;', code: '...', correct: false, msg: { en: 'Not mobile friendly!', id: 'Tidak mobile friendly!' } },
-                    { 
-                        label: { en: 'B. Media Query', id: 'B. Media Query' }, 
-                        previewCode: '@media (max-width: 768px)', 
-                        code: '\n    \n    /* RESPONSIVE BREAKPOINTS */\n    @media (max-width: 768px) {\n      /* <--- TABLET & MOBILE */\n    }', 
-                        cssToAdd: '',
-                        correct: true, 
-                        msg: { en: 'Media query added!', id: 'Media query ditambah!' } 
-                    }
+                    { label: { en: 'A. Max-Width 768px', id: 'A. Max-Width 768px' }, previewCode: '@media (max-width: 768px)', code: '\n    @media (max-width: 768px) {\n      /* MOBILE STYLES */\n    }', cssToAdd: '', correct: true, msg: { en: 'Query added.', id: 'Query ditambahkan.' } }
                 ]
             },
             {
-                id: 62,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '62. Mobile Grid', id: '62. Grid Mobile' },
-                desc: { en: 'Stack grid on mobile.', id: 'Stack grid di mobile.' },
-                guidance: { en: ['Inside @media (max-width: 768px), add:', '.grid-box { grid-template-columns: 1fr; }', 'Single column on mobile.'], id: ['Di dalam @media (max-width: 768px), tambah:', '.grid-box { grid-template-columns: 1fr; }', 'Satu kolom di mobile.'] },
+                id: 62, chapter: 5, type: 'essay',
+                title: { en: '62. Stack Grid', id: '62. Tumpuk Grid' },
+                desc: { en: 'Make grid 1 column on mobile.', id: 'Buat grid 1 kolom di mobile.' },
+                guidance: { en: ['Inside @media, add: .bento-grid { grid-template-columns: 1fr; }'], id: ['Di dalam @media, tambah: .bento-grid { grid-template-columns: 1fr; }'] },
                 validation: (code) => /@media.*grid-template-columns:\s*1fr/is.test(code),
-                successMsg: { en: 'Mobile grid stacked!', id: 'Grid mobile di-stack!' }
+                successMsg: { en: 'Stacked!', id: 'Ditumpuk!' }
             },
             {
-                id: 63,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '63. Mobile Menu', id: '63. Menu Mobile' },
-                desc: { en: 'Stack navigation on mobile.', id: 'Stack navigasi di mobile.' },
-                guidance: { en: ['In media query: .menu-box { flex-direction: column; }', 'Stack links vertically.', 'Add gap adjustment.'], id: ['Di media query: .menu-box { flex-direction: column; }', 'Stack link vertikal.', 'Tambah penyesuaian gap.'] },
+                id: 63, chapter: 5, type: 'essay',
+                title: { en: '63. Stack Nav', id: '63. Tumpuk Nav' },
+                desc: { en: 'Make menu vertical on mobile.', id: 'Buat menu vertikal di mobile.' },
+                guidance: { en: ['Inside @media, add: .menu-box { flex-direction: column; }'], id: ['Di dalam @media, tambah: .menu-box { flex-direction: column; }'] },
                 validation: (code) => /flex-direction:\s*column/i.test(code),
-                successMsg: { en: 'Mobile menu stacked!', id: 'Menu mobile di-stack!' }
+                successMsg: { en: 'Nav stacked.', id: 'Nav ditumpuk.' }
             },
             {
-                id: 64,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '64. Responsive Typography', id: '64. Tipografi Responsif' },
-                desc: { en: 'Adjust text size on mobile.', id: 'Sesuaikan ukuran teks di mobile.' },
-                guidance: { en: ['In media query: h1 { font-size: 1.5em; }', 'Reduce hero h2 size.', 'Make text readable on small screens.'], id: ['Di media query: h1 { font-size: 1.5em; }', 'Kurangi ukuran hero h2.', 'Buat teks terbaca di layar kecil.'] },
-                validation: (code) => /@media.*font-size/is.test(code),
-                successMsg: { en: 'Typography responsive!', id: 'Tipografi responsif!' }
+                id: 64, chapter: 5, type: 'essay',
+                title: { en: '64. Mobile Padding', id: '64. Padding Mobile' },
+                desc: { en: 'Reduce container padding.', id: 'Kurangi padding container.' },
+                guidance: { en: ['Inside @media, add: .main-container { padding: 10px; }'], id: ['Di dalam @media, tambah: .main-container { padding: 10px; }'] },
+                validation: (code) => /@media.*padding:\s*10px/is.test(code),
+                successMsg: { en: 'Padding reduced.', id: 'Padding dikurangi.' }
             },
             {
-                id: 65,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '65. Mobile Padding', id: '65. Padding Mobile' },
-                desc: { en: 'Reduce padding on mobile.', id: 'Kurangi padding di mobile.' },
-                guidance: { en: ['Reduce .main-container padding to 10px.', 'Reduce .hero padding.', 'More space for content.'], id: ['Kurangi padding .main-container jadi 10px.', 'Kurangi padding .hero.', 'Lebih banyak ruang untuk konten.'] },
-                validation: (code) => /@media.*padding/is.test(code),
-                successMsg: { en: 'Mobile padding adjusted!', id: 'Padding mobile disesuaikan!' }
-            },
-            {
-                id: 66,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '66. Tablet Breakpoint', id: '66. Breakpoint Tablet' },
-                desc: { en: 'Add tablet-specific styles.', id: 'Tambah style khusus tablet.' },
-                guidance: { en: ['Add: @media (min-width: 768px) and (max-width: 1024px)', 'Set grid to 2 columns for tablet.', 'Medium-sized layouts.'], id: ['Tambah: @media (min-width: 768px) and (max-width: 1024px)', 'Set grid jadi 2 kolom untuk tablet.', 'Layout ukuran medium.'] },
-                validation: (code) => /@media.*min-width.*max-width/is.test(code),
-                successMsg: { en: 'Tablet styles added!', id: 'Style tablet ditambah!' }
-            },
-            {
-                id: 67,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '67. Mobile Form', id: '67. Form Mobile' },
-                desc: { en: 'Optimize form for mobile.', id: 'Optimalkan form untuk mobile.' },
-                guidance: { en: ['In mobile query: .contact-form { padding: 20px; }', 'Reduce input padding.', 'Full width already set.'], id: ['Di query mobile: .contact-form { padding: 20px; }', 'Kurangi padding input.', 'Lebar penuh sudah diset.'] },
-                validation: (code) => /@media.*contact-form/is.test(code),
-                successMsg: { en: 'Mobile form optimized!', id: 'Form mobile dioptimalkan!' }
-            },
-            {
-                id: 68,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '68. Hide Elements', id: '68. Sembunyikan Elemen' },
-                desc: { en: 'Hide elements on mobile.', id: 'Sembunyikan elemen di mobile.' },
-                guidance: { en: ['In mobile query, try: .some-element { display: none; }', 'Or visibility: hidden;', 'Hide decorative items.'], id: ['Di query mobile, coba: .some-element { display: none; }', 'Atau visibility: hidden;', 'Sembunyikan item dekoratif.'] },
-                validation: (code) => /@media.*(display:\s*none|visibility:\s*hidden)/is.test(code),
-                successMsg: { en: 'Elements hidden!', id: 'Elemen disembunyikan!' }
-            },
-            {
-                id: 69,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '69. Touch Targets', id: '69. Target Sentuh' },
-                desc: { en: 'Make buttons bigger on mobile.', id: 'Perbesar tombol di mobile.' },
-                guidance: { en: ['In mobile: .submit-btn { padding: 15px; }', 'Increase touch area.', 'Min 44px height recommended.'], id: ['Di mobile: .submit-btn { padding: 15px; }', 'Perbesar area sentuh.', 'Min 44px tinggi disarankan.'] },
-                validation: (code) => /@media.*submit-btn.*padding/is.test(code),
-                successMsg: { en: 'Touch targets improved!', id: 'Target sentuh diperbaiki!' }
-            },
-            {
-                id: 70,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '70. Mobile Hero', id: '70. Hero Mobile' },
-                desc: { en: 'Adjust hero for mobile.', id: 'Sesuaikan hero untuk mobile.' },
-                guidance: { en: ['Reduce hero padding: 40px 15px;', 'Reduce hero h2 font-size.', 'Keep it impactful but smaller.'], id: ['Kurangi hero padding: 40px 15px;', 'Kurangi font-size hero h2.', 'Tetap impactful tapi lebih kecil.'] },
+                id: 65, chapter: 5, type: 'essay',
+                title: { en: '65. Mobile Hero', id: '65. Hero Mobile' },
+                desc: { en: 'Smaller hero padding.', id: 'Padding hero kecil.' },
+                guidance: { en: ['Inside @media, .hero { padding: 30px 10px; }'], id: ['Di dalam @media, .hero { padding: 30px 10px; }'] },
                 validation: (code) => /@media.*hero/is.test(code),
-                successMsg: { en: 'Mobile hero adjusted!', id: 'Hero mobile disesuaikan!' }
+                successMsg: { en: 'Hero resized.', id: 'Hero diresize.' }
             },
             {
-                id: 71,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '71. Max-Width Container', id: '71. Container Max-Width' },
-                desc: { en: 'Set max width for large screens.', id: 'Set max width untuk layar besar.' },
-                guidance: { en: ['Add: @media (min-width: 1200px)', '.main-container { max-width: 1100px; }', 'Center on large screens.'], id: ['Tambah: @media (min-width: 1200px)', '.main-container { max-width: 1100px; }', 'Center di layar besar.'] },
-                validation: (code) => /@media.*min-width.*1200/is.test(code),
-                successMsg: { en: 'Large screen optimized!', id: 'Layar besar dioptimalkan!' }
+                id: 66, chapter: 5, type: 'essay',
+                title: { en: '66. Mobile Font', id: '66. Font Mobile' },
+                desc: { en: 'Smaller headings.', id: 'Judul lebih kecil.' },
+                guidance: { en: ['Inside @media, h1 { font-size: 1.5em; }'], id: ['Di dalam @media, h1 { font-size: 1.5em; }'] },
+                validation: (code) => /@media.*font-size/is.test(code),
+                successMsg: { en: 'Font resized.', id: 'Font diresize.' }
             },
             {
-                id: 72,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '72. Flexible Images', id: '72. Gambar Fleksibel' },
-                desc: { en: 'Make images responsive.', id: 'Buat gambar responsif.' },
-                guidance: { en: ['Add: img { max-width: 100%; height: auto; }', 'Images never overflow.', 'Maintain aspect ratio.'], id: ['Tambah: img { max-width: 100%; height: auto; }', 'Gambar tak akan overflow.', 'Pertahankan aspect ratio.'] },
-                validation: (code) => /img.*max-width:\s*100%/is.test(code),
-                successMsg: { en: 'Images flexible!', id: 'Gambar fleksibel!' }
+                id: 67, chapter: 5, type: 'essay',
+                title: { en: '67. Hide Elements', id: '67. Sembunyi Elemen' },
+                desc: { en: 'Hide box 4 on mobile.', id: 'Sembunyikan box 4 di mobile.' },
+                guidance: { en: ['Inside @media, .box-4 { display: none; }'], id: ['Di dalam @media, .box-4 { display: none; }'] },
+                validation: (code) => /@media.*display:\s*none/is.test(code),
+                successMsg: { en: 'Hidden.', id: 'Disembunyikan.' }
             },
             {
-                id: 73,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '73. Responsive Bento', id: '73. Bento Responsif' },
-                desc: { en: 'Make bento grid responsive.', id: 'Buat bento grid responsif.' },
-                guidance: { en: ['On mobile: single column, reset grid-template-areas.', 'On tablet: 2 columns.', 'Desktop: keep complex layout.'], id: ['Di mobile: satu kolom, reset grid-template-areas.', 'Di tablet: 2 kolom.', 'Desktop: pertahankan layout kompleks.'] },
-                validation: (code) => /@media.*bento/is.test(code),
-                successMsg: { en: 'Bento responsive!', id: 'Bento responsif!' }
+                id: 68, chapter: 5, type: 'choice',
+                title: { en: '68. Tablet Query', id: '68. Tablet Query' },
+                desc: { en: 'Inject Tablet Breakpoint.', id: 'Suntik Breakpoint Tablet.' },
+                targetMarker: '/* === AREA CSS KAMU ADA DI BAWAH === */',
+                options: [
+                    { label: { en: 'A. Min-Width 769px', id: 'A. Min-Width 769px' }, previewCode: '@media (min-width: 769px)', code: '\n    @media (min-width: 769px) and (max-width: 1024px) {\n      /* TABLET */\n    }', cssToAdd: '', correct: true, msg: { en: 'Tablet query added.', id: 'Query tablet ditambah.' } }
+                ]
             },
             {
-                id: 74,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '74. Viewport Units', id: '74. Unit Viewport' },
-                desc: { en: 'Use viewport units.', id: 'Pakai unit viewport.' },
-                guidance: { en: ['Try: .hero { min-height: 40vh; }', 'Use vw for widths: width: 90vw;', 'Relative to viewport.'], id: ['Coba: .hero { min-height: 40vh; }', 'Pakai vw untuk lebar: width: 90vw;', 'Relatif terhadap viewport.'] },
-                validation: (code) => /\d+v(h|w)/i.test(code),
-                successMsg: { en: 'Viewport units used!', id: 'Unit viewport dipakai!' }
+                id: 69, chapter: 5, type: 'essay',
+                title: { en: '69. Tablet Grid', id: '69. Grid Tablet' },
+                desc: { en: '2 Columns on tablet.', id: '2 Kolom di tablet.' },
+                guidance: { en: ['In tablet query, .bento-grid { grid-template-columns: 1fr 1fr; }'], id: ['Di query tablet, .bento-grid { grid-template-columns: 1fr 1fr; }'] },
+                validation: (code) => /@media.*min-width.*grid-template/is.test(code),
+                successMsg: { en: 'Tablet grid set.', id: 'Grid tablet diatur.' }
             },
             {
-                id: 75,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '75. Orientation Query', id: '75. Query Orientasi' },
-                desc: { en: 'Handle landscape/portrait.', id: 'Tangani landscape/portrait.' },
-                guidance: { en: ['Add: @media (orientation: landscape)', 'Adjust layouts for landscape.', 'Different from portrait.'], id: ['Tambah: @media (orientation: landscape)', 'Sesuaikan layout untuk landscape.', 'Beda dari portrait.'] },
-                validation: (code) => /@media.*orientation/i.test(code),
-                successMsg: { en: 'Orientation handled!', id: 'Orientasi ditangani!' }
+                id: 70, chapter: 5, type: 'essay',
+                title: { en: '70. Touch Target', id: '70. Target Sentuh' },
+                desc: { en: 'Bigger buttons on mobile.', id: 'Tombol besar di mobile.' },
+                guidance: { en: ['In mobile query, .btn { padding: 15px; }'], id: ['Di query mobile, .btn { padding: 15px; }'] },
+                validation: (code) => /@media.*btn.*padding/is.test(code),
+                successMsg: { en: 'Touch ready.', id: 'Siap sentuh.' }
             },
             {
-                id: 76,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '76. Mobile-First Approach', id: '76. Pendekatan Mobile-First' },
-                desc: { en: 'Start with mobile styles.', id: 'Mulai dengan style mobile.' },
-                guidance: { en: ['Base styles are mobile.', 'Use min-width queries to enhance for larger.', 'Progressive enhancement.'], id: ['Style dasar adalah mobile.', 'Pakai query min-width untuk enhance di lebih besar.', 'Progressive enhancement.'] },
-                validation: (code) => /@media.*min-width/is.test(code),
-                successMsg: { en: 'Mobile-first applied!', id: 'Mobile-first diterapkan!' }
+                id: 71, chapter: 5, type: 'essay',
+                title: { en: '71. Flex Wrap', id: '71. Flex Wrap' },
+                desc: { en: 'Allow menu to wrap.', id: 'Izinkan menu membungkus.' },
+                guidance: { en: ['Add flex-wrap: wrap; to .menu-box (global).'], id: ['Tambah flex-wrap: wrap; ke .menu-box (global).'] },
+                validation: (code) => /flex-wrap:\s*wrap/i.test(code),
+                successMsg: { en: 'Wrapped.', id: 'Dibungkus.' }
             },
             {
-                id: 77,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '77. Print Styles', id: '77. Style Print' },
-                desc: { en: 'Add print-specific styles.', id: 'Tambah style khusus print.' },
-                guidance: { en: ['Add: @media print', 'Hide navigation, show only content.', 'Optimize for printing.'], id: ['Tambah: @media print', 'Sembunyikan navigasi, tampilkan konten saja.', 'Optimalkan untuk print.'] },
-                validation: (code) => /@media\s+print/i.test(code),
-                successMsg: { en: 'Print styles added!', id: 'Style print ditambah!' }
+                id: 72, chapter: 5, type: 'essay',
+                title: { en: '72. Viewport Height', id: '72. Tinggi Viewport' },
+                desc: { en: 'Hero takes screen height.', id: 'Hero ambil tinggi layar.' },
+                guidance: { en: ['Add min-height: 50vh; to .hero.'], id: ['Tambah min-height: 50vh; ke .hero.'] },
+                validation: (code) => /50vh/i.test(code),
+                successMsg: { en: 'Viewport unit used.', id: 'Unit viewport dipakai.' }
             },
             {
-                id: 78,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '78. Container Queries Prep', id: '78. Persiapan Container Queries' },
-                desc: { en: 'Prepare for container queries.', id: 'Persiapkan untuk container queries.' },
-                guidance: { en: ['Add: container-type: inline-size; to .main-container', 'Future: @container queries.', 'Modern CSS feature.'], id: ['Tambah: container-type: inline-size; ke .main-container', 'Masa depan: @container queries.', 'Fitur CSS modern.'] },
+                id: 73, chapter: 5, type: 'choice',
+                title: { en: '73. Print Style', id: '73. Gaya Print' },
+                desc: { en: 'Inject Print Query.', id: 'Suntik Query Print.' },
+                targetMarker: '/* === AREA CSS KAMU ADA DI BAWAH === */',
+                options: [
+                    { label: { en: 'A. Media Print', id: 'A. Media Print' }, previewCode: '@media print', code: '\n    @media print {\n      .hero, .site-footer { display: none; }\n      body { color: black; background: white; }\n    }', cssToAdd: '', correct: true, msg: { en: 'Print style added.', id: 'Style print ditambah.' } }
+                ]
+            },
+            {
+                id: 74, chapter: 5, type: 'essay',
+                title: { en: '74. Print Border', id: '74. Border Print' },
+                desc: { en: 'Remove borders on print.', id: 'Hapus border saat print.' },
+                guidance: { en: ['In print query, add * { border: none !important; }'], id: ['Di query print, tambah * { border: none !important; }'] },
+                validation: (code) => /print[\s\S]*border:\s*none/i.test(code),
+                successMsg: { en: 'Clean print.', id: 'Print bersih.' }
+            },
+            {
+                id: 75, chapter: 5, type: 'choice',
+                title: { en: '75. Image Layout', id: '75. Layout Gambar' },
+                desc: { en: 'Inject an image for testing.', id: 'Suntik gambar untuk tes.' },
+                targetMarker: '',
+                options: [
+                    { label: { en: 'A. Test Image', id: 'A. Gambar Tes' }, previewCode: '<img src="...">', code: '<img src="https://via.placeholder.com/800x400" class="resp-img" alt="Test">', cssToAdd: '', correct: true, msg: { en: 'Image added.', id: 'Gambar ditambah.' } }
+                ]
+            },
+            {
+                id: 76, chapter: 5, type: 'essay',
+                title: { en: '76. Fluid Image', id: '76. Gambar Cair' },
+                desc: { en: 'Make image responsive.', id: 'Buat gambar responsif.' },
+                guidance: { en: ['Add .resp-img { max-width: 100%; height: auto; }'], id: ['Tambah .resp-img { max-width: 100%; height: auto; }'] },
+                validation: (code) => /max-width:\s*100%/i.test(code),
+                successMsg: { en: 'Fluid image.', id: 'Gambar cair.' }
+            },
+            {
+                id: 77, chapter: 5, type: 'essay',
+                title: { en: '77. Round Image', id: '77. Gambar Bulat' },
+                desc: { en: 'Round the image corners.', id: 'Bulatkan sudut gambar.' },
+                guidance: { en: ['Add border-radius: var(--radius); to .resp-img.'], id: ['Tambah border-radius: var(--radius); ke .resp-img.'] },
+                validation: (code) => /\.resp-img[\s\S]*radius/i.test(code),
+                successMsg: { en: 'Rounded.', id: 'Bulat.' }
+            },
+            {
+                id: 78, chapter: 5, type: 'essay',
+                title: { en: '78. Mobile Gap', id: '78. Gap Mobile' },
+                desc: { en: 'Smaller gaps on mobile.', id: 'Gap kecil di mobile.' },
+                guidance: { en: ['In mobile query, .bento-grid { gap: 10px; }'], id: ['Di query mobile, .bento-grid { gap: 10px; }'] },
+                validation: (code) => /@media.*gap:\s*10px/is.test(code),
+                successMsg: { en: 'Gap adjusted.', id: 'Gap disesuaikan.' }
+            },
+            {
+                id: 79, chapter: 5, type: 'essay',
+                title: { en: '79. Container Query Prep', id: '79. Prep Container Query' },
+                desc: { en: 'Define container type.', id: 'Definisikan tipe container.' },
+                guidance: { en: ['Add container-type: inline-size; to .main-container.'], id: ['Tambah container-type: inline-size; ke .main-container.'] },
                 validation: (code) => /container-type/i.test(code),
-                successMsg: { en: 'Container ready!', id: 'Container siap!' }
+                successMsg: { en: 'Container defined.', id: 'Container didefinisikan.' }
             },
             {
-                id: 79,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '79. Responsive Gaps', id: '79. Gap Responsif' },
-                desc: { en: 'Adjust gaps per breakpoint.', id: 'Sesuaikan gap per breakpoint.' },
-                guidance: { en: ['Mobile: smaller gaps (10px).', 'Tablet: medium gaps (15px).', 'Desktop: larger gaps (20px+).'], id: ['Mobile: gap lebih kecil (10px).', 'Tablet: gap medium (15px).', 'Desktop: gap lebih besar (20px+).'] },
-                validation: (code) => /@media.*gap/is.test(code),
-                successMsg: { en: 'Responsive gaps!', id: 'Gap responsif!' }
-            },
-            {
-                id: 80,
-                chapter: 5,
-                type: 'essay',
-                title: { en: '80. Chapter 5 Complete!', id: '80. Bab 5 Selesai!' },
-                desc: { en: 'Responsive design mastered! Ready for animations.', id: 'Desain responsif dikuasai! Siap untuk animasi.' },
-                guidance: { en: ['Test on different screen sizes.', 'Check all breakpoints work.', 'Ready for polish!'], id: ['Test di berbagai ukuran layar.', 'Cek semua breakpoint jalan.', 'Siap untuk polish!'] },
+                id: 80, chapter: 5, type: 'essay',
+                title: { en: '80. Review Responsive', id: '80. Review Responsif' },
+                desc: { en: 'Check resizing.', id: 'Cek resize.' },
+                guidance: { en: ['Resize browser to check mobile view.', 'Save to finish.'], id: ['Resize browser untuk cek tampilan mobile.', 'Simpan untuk selesai.'] },
                 validation: (code) => true,
-                successMsg: { en: 'Chapter 5 Complete! 📱', id: 'Bab 5 Selesai! 📱' }
+                successMsg: { en: 'Chapter 5 Done!', id: 'Bab 5 Selesai!' }
             },
 
             // ========================================
-            // CHAPTER 6: ANIMATIONS & POLISH (81-90)
+            // CHAPTER 6: ANIMATION (81-90)
             // ========================================
             {
-                id: 81,
-                chapter: 6,
-                type: 'choice',
+                id: 81, chapter: 6, type: 'choice',
                 title: { en: '81. Transitions', id: '81. Transisi' },
-                desc: { en: 'Add smooth transitions.', id: 'Tambahkan transisi halus.' },
-                targetMarker: '.submit-btn {',
+                desc: { en: 'Inject transition property.', id: 'Suntik properti transition.' },
+                targetMarker: '.btn {',
                 options: [
-                    { label: { en: 'A. No Transition', id: 'A. Tanpa Transisi' }, previewCode: 'background: blue;', code: '...', correct: false, msg: { en: 'Too abrupt!', id: 'Terlalu mendadak!' } },
-                    { 
-                        label: { en: 'B. Smooth Transition', id: 'B. Transisi Halus' }, 
-                        previewCode: 'transition: all 0.3s ease;', 
-                        code: '.submit-btn {\n      background-color: var(--primary-color);\n      transition: all 0.3s ease; /* <--- EDIT DURATION */\n      color: white;', 
-                        cssToAdd: '',
-                        correct: true, 
-                        msg: { en: 'Transition added!', id: 'Transisi ditambah!' } 
-                    }
+                    { label: { en: 'A. Transition All', id: 'A. Transition All' }, previewCode: 'transition: all 0.3s', code: '.btn {\n      transition: all 0.3s ease;', cssToAdd: '', correct: true, msg: { en: 'Transition added.', id: 'Transisi ditambah.' } }
                 ]
             },
             {
-                id: 82,
-                chapter: 6,
-                type: 'essay',
-                title: { en: '82. Card Hover', id: '82. Hover Kartu' },
-                desc: { en: 'Add hover effect to cards.', id: 'Tambah efek hover ke kartu.' },
-                guidance: { en: ['Add to .card: transition: transform 0.2s;', '.card:hover { transform: translateY(-5px); }', 'Cards lift on hover.'], id: ['Tambah ke .card: transition: transform 0.2s;', '.card:hover { transform: translateY(-5px); }', 'Kartu terangkat saat hover.'] },
-                validation: (code) => /\.card:hover.*transform/is.test(code),
-                successMsg: { en: 'Cards animate!', id: 'Kartu beranimasi!' }
+                id: 82, chapter: 6, type: 'essay',
+                title: { en: '82. Button Transform', id: '82. Transform Tombol' },
+                desc: { en: 'Move button on hover.', id: 'Gerakkan tombol saat hover.' },
+                guidance: { en: ['In .btn:hover, add transform: translateY(-2px);'], id: ['Di .btn:hover, tambah transform: translateY(-2px);'] },
+                validation: (code) => /translateY/i.test(code),
+                successMsg: { en: 'Button moves.', id: 'Tombol bergerak.' }
             },
             {
-                id: 83,
-                chapter: 6,
-                type: 'essay',
-                title: { en: '83. Link Underline', id: '83. Garis Bawah Link' },
-                desc: { en: 'Animated underline on links.', id: 'Garis bawah animasi di link.' },
-                guidance: { en: ['Add: .menu-box a { border-bottom: 2px solid transparent; }', ':hover { border-bottom-color: var(--primary-color); }', 'Add transition.'], id: ['Tambah: .menu-box a { border-bottom: 2px solid transparent; }', ':hover { border-bottom-color: var(--primary-color); }', 'Tambah transition.'] },
-                validation: (code) => /menu-box\s+a:hover.*border/is.test(code),
-                successMsg: { en: 'Links animate!', id: 'Link beranimasi!' }
+                id: 83, chapter: 6, type: 'choice',
+                title: { en: '83. Keyframes', id: '83. Keyframes' },
+                desc: { en: 'Inject FadeIn animation.', id: 'Suntik animasi FadeIn.' },
+                targetMarker: '/* === AREA CSS KAMU ADA DI BAWAH === */',
+                options: [
+                    { label: { en: 'A. FadeIn Block', id: 'A. Blok FadeIn' }, previewCode: '@keyframes fadeIn', code: '\n    @keyframes fadeIn {\n      from { opacity: 0; transform: translateY(20px); }\n      to { opacity: 1; transform: translateY(0); }\n    }', cssToAdd: '', correct: true, msg: { en: 'Keyframes added.', id: 'Keyframes ditambah.' } }
+                ]
             },
             {
-                id: 84,
-                chapter: 6,
-                type: 'essay',
-                title: { en: '84. Fade In Animation', id: '84. Animasi Fade In' },
-                desc: { en: 'Create fade in keyframe.', id: 'Buat keyframe fade in.' },
-                guidance: { en: ['Add: @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }', '.hero { animation: fadeIn 1s ease; }', 'Hero fades in.'], id: ['Tambah: @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }', '.hero { animation: fadeIn 1s ease; }', 'Hero fade in.'] },
-                validation: (code) => /@keyframes\s+fadeIn/i.test(code),
-                successMsg: { en: 'Fade in created!', id: 'Fade in dibuat!' }
+                id: 84, chapter: 6, type: 'essay',
+                title: { en: '84. Apply Animation', id: '84. Terapkan Animasi' },
+                desc: { en: 'Animate the Hero.', id: 'Animasi Hero.' },
+                guidance: { en: ['Add animation: fadeIn 1s ease-out; to .hero.'], id: ['Tambah animation: fadeIn 1s ease-out; ke .hero.'] },
+                validation: (code) => /animation:\s*fadeIn/i.test(code),
+                successMsg: { en: 'Hero fades in.', id: 'Hero fade in.' }
             },
             {
-                id: 85,
-                chapter: 6,
-                type: 'essay',
-                title: { en: '85. Slide In Animation', id: '85. Animasi Slide In' },
-                desc: { en: 'Slide elements from side.', id: 'Geser elemen dari samping.' },
-                guidance: { en: ['@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }', 'Apply to nav or cards.', 'Entrance animation.'], id: ['@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }', 'Terapkan ke nav atau cards.', 'Animasi masuk.'] },
-                validation: (code) => /@keyframes\s+slideIn/i.test(code),
-                successMsg: { en: 'Slide in created!', id: 'Slide in dibuat!' }
+                id: 85, chapter: 6, type: 'essay',
+                title: { en: '85. Card Hover', id: '85. Hover Kartu' },
+                desc: { en: 'Cards lift up.', id: 'Kartu terangkat.' },
+                guidance: { en: ['Add transition: transform 0.2s; to .card.', 'Add .card:hover { transform: translateY(-5px); }'], id: ['Tambah transition: transform 0.2s; ke .card.', 'Tambah .card:hover { transform: translateY(-5px); }'] },
+                validation: (code) => /\.card:hover/i.test(code) && /translateY/i.test(code),
+                successMsg: { en: 'Cards lift.', id: 'Kartu terangkat.' }
             },
             {
-                id: 86,
-                chapter: 6,
-                type: 'essay',
-                title: { en: '86. Pulse Effect', id: '86. Efek Pulse' },
-                desc: { en: 'Create pulsing animation.', id: 'Buat animasi pulse.' },
-                guidance: { en: ['@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }', 'Apply to button: animation: pulse 2s infinite;', 'Attention grabbing.'], id: ['@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }', 'Terapkan ke button: animation: pulse 2s infinite;', 'Menarik perhatian.'] },
-                validation: (code) => /@keyframes\s+pulse/i.test(code),
-                successMsg: { en: 'Pulse effect added!', id: 'Efek pulse ditambah!' }
+                id: 86, chapter: 6, type: 'choice',
+                title: { en: '86. Pulse Animation', id: '86. Animasi Pulse' },
+                desc: { en: 'Inject Pulse Keyframes.', id: 'Suntik Keyframes Pulse.' },
+                targetMarker: '/* === AREA CSS KAMU ADA DI BAWAH === */',
+                options: [
+                    { label: { en: 'A. Pulse Block', id: 'A. Blok Pulse' }, previewCode: '@keyframes pulse', code: '\n    @keyframes pulse {\n      0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }\n      70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }\n      100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }\n    }', cssToAdd: '', correct: true, msg: { en: 'Pulse added.', id: 'Pulse ditambah.' } }
+                ]
             },
             {
-                id: 87,
-                chapter: 6,
-                type: 'essay',
-                title: { en: '87. Loading Spinner', id: '87. Loading Spinner' },
-                desc: { en: 'Create spinning loader.', id: 'Buat loader berputar.' },
-                guidance: { en: ['@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }', 'Create .loader div with border.', 'animation: spin 1s linear infinite;'], id: ['@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }', 'Buat div .loader dengan border.', 'animation: spin 1s linear infinite;'] },
-                validation: (code) => /@keyframes\s+spin/i.test(code),
-                successMsg: { en: 'Spinner created!', id: 'Spinner dibuat!' }
+                id: 87, chapter: 6, type: 'essay',
+                title: { en: '87. Apply Pulse', id: '87. Terapkan Pulse' },
+                desc: { en: 'Pulse the button.', id: 'Pulse tombolnya.' },
+                guidance: { en: ['Add animation: pulse 2s infinite; to .btn:hover.'], id: ['Tambah animation: pulse 2s infinite; ke .btn:hover.'] },
+                validation: (code) => /pulse\s+2s/i.test(code),
+                successMsg: { en: 'Button pulsing.', id: 'Tombol berdenyut.' }
             },
             {
-                id: 88,
-                chapter: 6,
-                type: 'essay',
-                title: { en: '88. Bounce Animation', id: '88. Animasi Bounce' },
-                desc: { en: 'Create bouncing effect.', id: 'Buat efek bounce.' },
-                guidance: { en: ['@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }', 'Add cubic-bezier for realistic bounce.', 'Apply to elements.'], id: ['@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }', 'Tambah cubic-bezier untuk bounce realistis.', 'Terapkan ke elemen.'] },
-                validation: (code) => /@keyframes\s+bounce/i.test(code),
-                successMsg: { en: 'Bounce created!', id: 'Bounce dibuat!' }
+                id: 88, chapter: 6, type: 'essay',
+                title: { en: '88. Input Focus Trans', id: '88. Transisi Fokus' },
+                desc: { en: 'Smooth input focus.', id: 'Fokus input halus.' },
+                guidance: { en: ['Add transition: border-color 0.3s; to .inp.'], id: ['Tambah transition: border-color 0.3s; ke .inp.'] },
+                validation: (code) => /\.inp[\s\S]*transition/i.test(code),
+                successMsg: { en: 'Smooth focus.', id: 'Fokus halus.' }
             },
             {
-                id: 89,
-                chapter: 6,
-                type: 'essay',
-                title: { en: '89. Stagger Animations', id: '89. Animasi Bertahap' },
-                desc: { en: 'Animate cards with delay.', id: 'Animasi kartu dengan delay.' },
-                guidance: { en: ['.card:nth-child(1) { animation-delay: 0s; }', ':nth-child(2) { animation-delay: 0.1s; }', 'Staggered entrance.'], id: ['.card:nth-child(1) { animation-delay: 0s; }', ':nth-child(2) { animation-delay: 0.1s; }', 'Masuk bertahap.'] },
-                validation: (code) => /animation-delay|nth-child/i.test(code),
-                successMsg: { en: 'Stagger effect!', id: 'Efek bertahap!' }
+                id: 89, chapter: 6, type: 'essay',
+                title: { en: '89. Stagger Delay', id: '89. Delay Bertahap' },
+                desc: { en: 'Animate cards sequentially.', id: 'Animasi kartu berurutan.' },
+                guidance: { en: ['Add .card { animation: fadeIn 0.8s backwards; }', 'Add .box-1 { animation-delay: 0.2s; }'], id: ['Tambah .card { animation: fadeIn 0.8s backwards; }', 'Tambah .box-1 { animation-delay: 0.2s; }'] },
+                validation: (code) => /animation-delay:/i.test(code),
+                successMsg: { en: 'Staggered.', id: 'Bertahap.' }
             },
             {
-                id: 90,
-                chapter: 6,
-                type: 'playground',
+                id: 90, chapter: 6, type: 'playground',
                 title: { en: '90. FINAL PLAYGROUND', id: '90. PLAYGROUND AKHIR' },
-                desc: { en: 'You mastered HTML/CSS! Create anything you want.', id: 'Kamu menguasai HTML/CSS! Buat apapun yang kamu mau.' },
+                desc: { en: 'You are a CSS Master!', id: 'Kamu CSS Master!' },
                 guidance: { 
                     en: [
-                        '🎉 Congratulations! You completed all 90 levels!',
-                        '✨ You learned: Structure, Forms, Theming, Grid, Responsive, Animations',
-                        '🚀 Export your masterpiece and keep building!',
-                        '💡 Next: Learn JavaScript to make it interactive!'
+                        '🎉 All 90 levels completed!',
+                        '✨ You built: Layouts, Forms, Themes, Responsive, Animations.',
+                        '🚀 Make any final changes you want.',
+                        '💾 Export your code to keep it forever.'
                     ], 
                     id: [
-                        '🎉 Selamat! Kamu menyelesaikan 90 level!',
-                        '✨ Kamu belajar: Struktur, Form, Theming, Grid, Responsif, Animasi',
-                        '🚀 Export karya mastermu dan terus berkarya!',
-                        '💡 Selanjutnya: Belajar JavaScript untuk interaktivitas!'
+                        '🎉 90 Level selesai!',
+                        '✨ Kamu membuat: Layout, Form, Tema, Responsif, Animasi.',
+                        '🚀 Lakukan perubahan akhir sesukamu.',
+                        '💾 Export kodemu untuk disimpan selamanya.'
                     ] 
                 }
             }
@@ -1147,9 +838,7 @@
 </head>
 <body>
 
-  <!-- STEP_1_CONTAINER -->
-
-</body>
+  </body>
 </html>`;
 
         function App() {
@@ -1157,8 +846,6 @@
             const [levelIdx, setLevelIdx] = useState(0);
             const [code, setCode] = useState(BASE_TEMPLATE);
             const [feedback, setFeedback] = useState(null);
-            const [showHelp, setShowHelp] = useState(false);
-            const fileInputRef = useRef(null);
             
             const level = LEVELS[levelIdx];
 
@@ -1188,8 +875,14 @@
             };
 
             const handleEssayCheck = () => {
+                // If it's the final playground, just save/succeed
+                if (level.type === 'playground') {
+                     setFeedback({ type: 'success', msg: lang === 'id' ? 'Kode Disimpan!' : 'Code Saved!' });
+                     return;
+                }
+
                 if (level.validation && !level.validation(code)) {
-                    setFeedback({ type: 'error', msg: lang === 'id' ? 'Coba ubah nilainya (jangan nilai default).' : 'Try changing default values.' });
+                    setFeedback({ type: 'error', msg: lang === 'id' ? 'Cek instruksi. Nilai belum sesuai.' : 'Check instructions. Value not matched.' });
                 } else {
                     setFeedback({ type: 'success', msg: level.successMsg ? level.successMsg[lang] : 'Saved!' });
                 }
@@ -1201,81 +894,14 @@
             };
 
             const exportHTML = () => {
-                // Create save data object
-                const saveData = {
-                    levelIdx: levelIdx,
-                    lang: lang,
-                    code: code
-                };
-                
-                // Embed save data as HTML comment at the end
-                const saveComment = `\n<!-- NP_MOD_SAVE_DATA: ${JSON.stringify(saveData)} -->`;
-                const codeWithSaveData = code + saveComment;
-                
-                const blob = new Blob([codeWithSaveData], {type: 'text/html'});
+                const blob = new Blob([code], {type: 'text/html'});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `my-website-level-${levelIdx + 1}.html`;
+                a.download = 'modern-website.html';
                 a.click();
-                URL.revokeObjectURL(url);
             };
 
-            const loadHTML = () => {
-                fileInputRef.current?.click();
-            };
-
-            const handleFileLoad = (event) => {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const fileContent = e.target.result;
-                    
-                    // Extract save data using regex
-                    const saveDataRegex = /<!--\s*NP_MOD_SAVE_DATA:\s*({.*?})\s*-->/;
-                    const match = fileContent.match(saveDataRegex);
-                    
-                    if (match && match[1]) {
-                        try {
-                            const saveData = JSON.parse(match[1]);
-                            
-                            // Remove save data comment from code before restoring
-                            const codeWithoutSaveData = fileContent.replace(/\n?<!--\s*NP_MOD_SAVE_DATA:.*?-->\s*$/, '');
-                            
-                            // Restore state
-                            setLevelIdx(saveData.levelIdx || 0);
-                            setLang(saveData.lang || 'id');
-                            setCode(saveData.code || codeWithoutSaveData);
-                            setFeedback({ 
-                                type: 'success', 
-                                msg: lang === 'id' 
-                                    ? `Progress dimuat! Level ${(saveData.levelIdx || 0) + 1}/90` 
-                                    : `Progress loaded! Level ${(saveData.levelIdx || 0) + 1}/90` 
-                            });
-                        } catch (err) {
-                            setFeedback({ 
-                                type: 'error', 
-                                msg: lang === 'id' ? 'File tidak valid!' : 'Invalid file!' 
-                            });
-                        }
-                    } else {
-                        // No save data found, just load the code
-                        setCode(fileContent);
-                        setFeedback({ 
-                            type: 'success', 
-                            msg: lang === 'id' ? 'HTML dimuat (tanpa save data)' : 'HTML loaded (no save data)' 
-                        });
-                    }
-                };
-                reader.readAsText(file);
-                
-                // Reset file input
-                event.target.value = '';
-            };
-
-            // Get current chapter
             const currentChapter = level.chapter || 1;
             const chapterLevels = LEVELS.filter(l => l.chapter === currentChapter);
             const chapterProgress = chapterLevels.findIndex(l => l.id === level.id) + 1;
@@ -1286,48 +912,27 @@
                     <header className="bg-neutral-800 border-b border-neutral-700 p-3 flex justify-between items-center text-white shrink-0">
                         <div className="flex items-center gap-2">
                             <TerminalIcon className="text-green-500" />
-                            <span className="font-bold tracking-wider text-green-500 hidden sm:inline">NP_MODERNIZER.EXE v2 - Angga Conni Saputra 2026</span>
+                            <span className="font-bold tracking-wider text-green-500 hidden sm:inline">NP_MODERNIZER.EXE</span>
                             <span className="font-bold tracking-wider text-green-500 sm:hidden">NP_MOD</span>
                         </div>
                         <div className="flex gap-3 items-center">
                             <div className="text-xs bg-neutral-700 px-2 py-1 rounded text-neutral-300">
                                 Ch{currentChapter} • {chapterProgress}/{chapterLevels.length} • {levelIdx + 1}/90
                             </div>
-                            <button 
-                                onClick={() => setShowHelp(true)} 
-                                className="flex items-center gap-1 bg-neutral-700 hover:bg-neutral-600 px-2 py-1 rounded text-xs transition border border-neutral-600"
-                                title={lang === 'id' ? 'Bantuan' : 'Help'}
-                            >
-                                <HelpCircleIcon />
-                            </button>
                             <button onClick={() => setLang(l => l === 'en' ? 'id' : 'en')} className="flex items-center gap-1 bg-neutral-700 hover:bg-neutral-600 px-2 py-1 rounded text-xs transition border border-neutral-600">
                                 <GlobeIcon /> {lang.toUpperCase()}
                             </button>
-                            <button 
-                                onClick={loadHTML} 
-                                className="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1 transition shadow-lg shadow-purple-900/20"
-                            >
-                                <FolderOpenIcon /> <span className="hidden sm:inline">{lang === 'id' ? 'MUAT' : 'LOAD'}</span>
-                            </button>
                             <button onClick={exportHTML} className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1 transition shadow-lg shadow-blue-900/20">
-                                <SaveIcon /> <span className="hidden sm:inline">{lang === 'id' ? 'SIMPAN' : 'SAVE'}</span>
+                                <SaveIcon /> <span className="hidden sm:inline">EXPORT</span>
                             </button>
                         </div>
-                        {/* Hidden file input */}
-                        <input 
-                            type="file" 
-                            ref={fileInputRef} 
-                            onChange={handleFileLoad} 
-                            accept=".html" 
-                            style={{ display: 'none' }} 
-                        />
                     </header>
 
                     <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
                         {/* LEFT: INTERACTIVE TERMINAL */}
                         <div className="w-full md:w-1/2 flex flex-col border-r border-neutral-700 bg-black h-1/2 md:h-full">
                             <div className="p-4 bg-neutral-900 border-b border-neutral-700 shadow-md z-10">
-                                <h2 className="text-yellow-400 font-bold mb-1 text-base flex items-center gap-2">
+                                <h2 className="text-yellow-400 font-bold mb-1 text-base flex items-center gap-2 crt-text">
                                     <span className="text-green-500">&gt;</span> {level.title[lang]}
                                 </h2>
                                 <p className="text-neutral-300 text-sm mb-2 leading-relaxed">{level.desc[lang]}</p>
@@ -1422,88 +1027,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {/* HELP MODAL */}
-                    {showHelp && (
-                        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setShowHelp(false)}>
-                            <div className="bg-neutral-800 border-2 border-green-500 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                                <div className="p-6">
-                                    <div className="flex items-center gap-3 mb-4 border-b border-neutral-700 pb-3">
-                                        <HelpCircleIcon className="text-green-500" />
-                                        <h2 className="text-xl font-bold text-green-500">
-                                            {lang === 'id' ? 'Bantuan: Simpan & Muat Progress' : 'Help: Save & Load Progress'}
-                                        </h2>
-                                    </div>
-                                    
-                                    <div className="space-y-4 text-neutral-300 text-sm">
-                                        <div className="bg-neutral-900 p-4 rounded border border-neutral-700">
-                                            <h3 className="text-green-400 font-bold mb-2 flex items-center gap-2">
-                                                <SaveIcon className="w-4 h-4" />
-                                                {lang === 'id' ? '💾 SIMPAN (SAVE)' : '💾 SAVE'}
-                                            </h3>
-                                            <p className="mb-2">
-                                                {lang === 'id' 
-                                                    ? 'Klik tombol SIMPAN untuk mengekspor website kamu beserta progress belajar.' 
-                                                    : 'Click SAVE button to export your website with learning progress.'}
-                                            </p>
-                                            <ul className="list-disc list-inside space-y-1 text-xs ml-2">
-                                                <li>{lang === 'id' ? 'File HTML akan tersimpan di folder Downloads' : 'HTML file will be saved to Downloads folder'}</li>
-                                                <li>{lang === 'id' ? 'File bisa dibuka di browser (website berfungsi normal)' : 'File can be opened in browser (website works normally)'}</li>
-                                                <li>{lang === 'id' ? 'Progress tersimpan tersembunyi di dalam file' : 'Progress is hidden inside the file'}</li>
-                                            </ul>
-                                        </div>
-
-                                        <div className="bg-neutral-900 p-4 rounded border border-neutral-700">
-                                            <h3 className="text-purple-400 font-bold mb-2 flex items-center gap-2">
-                                                <FolderOpenIcon className="w-4 h-4" />
-                                                {lang === 'id' ? '📂 MUAT (LOAD)' : '📂 LOAD'}
-                                            </h3>
-                                            <p className="mb-2">
-                                                {lang === 'id' 
-                                                    ? 'Klik tombol MUAT untuk melanjutkan progress dari file yang sudah disimpan sebelumnya.' 
-                                                    : 'Click LOAD button to continue progress from previously saved file.'}
-                                            </p>
-                                            <ul className="list-disc list-inside space-y-1 text-xs ml-2">
-                                                <li>{lang === 'id' ? 'Pilih file HTML yang sudah diekspor' : 'Select previously exported HTML file'}</li>
-                                                <li>{lang === 'id' ? 'Level, bahasa, dan kode akan dimuat otomatis' : 'Level, language, and code will be loaded automatically'}</li>
-                                                <li>{lang === 'id' ? 'Kamu bisa lanjutkan dari titik terakhir!' : 'You can continue from where you left off!'}</li>
-                                            </ul>
-                                        </div>
-
-                                        <div className="bg-green-900/20 border border-green-600/50 p-4 rounded">
-                                            <p className="text-green-400 font-bold mb-2">
-                                                {lang === 'id' ? '✨ Cara Kerjanya:' : '✨ How it works:'}
-                                            </p>
-                                            <p className="text-xs">
-                                                {lang === 'id' 
-                                                    ? 'Saat SIMPAN, aplikasi menyisipkan komentar HTML tersembunyi di akhir file yang berisi data level dan kode kamu. Saat MUAT, aplikasi membaca komentar tersebut dan mengembalikan progress kamu. File tetap berfungsi sebagai website normal!' 
-                                                    : 'When SAVING, the app inserts a hidden HTML comment at the end of the file containing your level and code data. When LOADING, the app reads this comment and restores your progress. The file still works as a normal website!'}
-                                            </p>
-                                            <div className="mt-2 bg-black/40 p-2 rounded font-mono text-[10px] text-green-300">
-                                                {`<!-- NP_MOD_SAVE_DATA: {"levelIdx": 5, "lang": "id"} -->`}
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-yellow-900/20 border border-yellow-600/50 p-3 rounded">
-                                            <p className="text-yellow-400 text-xs">
-                                                <strong>{lang === 'id' ? '⚠️ Catatan:' : '⚠️ Note:'}</strong>{' '}
-                                                {lang === 'id' 
-                                                    ? 'Simpan progress secara berkala. Jika kamu menutup browser tanpa SIMPAN, progress akan hilang.' 
-                                                    : 'Save progress regularly. If you close the browser without SAVING, progress will be lost.'}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <button 
-                                        onClick={() => setShowHelp(false)} 
-                                        className="mt-6 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded transition"
-                                    >
-                                        {lang === 'id' ? 'MENGERTI!' : 'GOT IT!'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </div>
             );
         }
