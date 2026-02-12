@@ -62,6 +62,8 @@
         const PlayIcon = () => <Icon path={<polygon points="5 3 19 12 5 21 5 3"></polygon>} />;
         const GlobeIcon = () => <Icon path={<><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></>} />;
         const BookIcon = () => <Icon path={<><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></>} />;
+        const FolderOpenIcon = () => <Icon path={<><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></>} />;
+        const HelpCircleIcon = () => <Icon path={<><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></>} />;
 
         // --- ALL 90 LEVELS ---
         const LEVELS = [
@@ -1155,6 +1157,8 @@
             const [levelIdx, setLevelIdx] = useState(0);
             const [code, setCode] = useState(BASE_TEMPLATE);
             const [feedback, setFeedback] = useState(null);
+            const [showHelp, setShowHelp] = useState(false);
+            const fileInputRef = useRef(null);
             
             const level = LEVELS[levelIdx];
 
@@ -1197,12 +1201,78 @@
             };
 
             const exportHTML = () => {
-                const blob = new Blob([code], {type: 'text/html'});
+                // Create save data object
+                const saveData = {
+                    levelIdx: levelIdx,
+                    lang: lang,
+                    code: code
+                };
+                
+                // Embed save data as HTML comment at the end
+                const saveComment = `\n<!-- NP_MOD_SAVE_DATA: ${JSON.stringify(saveData)} -->`;
+                const codeWithSaveData = code + saveComment;
+                
+                const blob = new Blob([codeWithSaveData], {type: 'text/html'});
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'modern-website.html';
+                a.download = `my-website-level-${levelIdx + 1}.html`;
                 a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const loadHTML = () => {
+                fileInputRef.current?.click();
+            };
+
+            const handleFileLoad = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fileContent = e.target.result;
+                    
+                    // Extract save data using regex
+                    const saveDataRegex = /<!--\s*NP_MOD_SAVE_DATA:\s*({.*?})\s*-->/;
+                    const match = fileContent.match(saveDataRegex);
+                    
+                    if (match && match[1]) {
+                        try {
+                            const saveData = JSON.parse(match[1]);
+                            
+                            // Remove save data comment from code before restoring
+                            const codeWithoutSaveData = fileContent.replace(/\n?<!--\s*NP_MOD_SAVE_DATA:.*?-->\s*$/, '');
+                            
+                            // Restore state
+                            setLevelIdx(saveData.levelIdx || 0);
+                            setLang(saveData.lang || 'id');
+                            setCode(saveData.code || codeWithoutSaveData);
+                            setFeedback({ 
+                                type: 'success', 
+                                msg: lang === 'id' 
+                                    ? `Progress dimuat! Level ${(saveData.levelIdx || 0) + 1}/90` 
+                                    : `Progress loaded! Level ${(saveData.levelIdx || 0) + 1}/90` 
+                            });
+                        } catch (err) {
+                            setFeedback({ 
+                                type: 'error', 
+                                msg: lang === 'id' ? 'File tidak valid!' : 'Invalid file!' 
+                            });
+                        }
+                    } else {
+                        // No save data found, just load the code
+                        setCode(fileContent);
+                        setFeedback({ 
+                            type: 'success', 
+                            msg: lang === 'id' ? 'HTML dimuat (tanpa save data)' : 'HTML loaded (no save data)' 
+                        });
+                    }
+                };
+                reader.readAsText(file);
+                
+                // Reset file input
+                event.target.value = '';
             };
 
             // Get current chapter
@@ -1216,20 +1286,41 @@
                     <header className="bg-neutral-800 border-b border-neutral-700 p-3 flex justify-between items-center text-white shrink-0">
                         <div className="flex items-center gap-2">
                             <TerminalIcon className="text-green-500" />
-                            <span className="font-bold tracking-wider text-green-500 hidden sm:inline">NP_MODERNIZER.EXE - By Angga Conni Saputra</span>
+                            <span className="font-bold tracking-wider text-green-500 hidden sm:inline">NP_MODERNIZER.EXE</span>
                             <span className="font-bold tracking-wider text-green-500 sm:hidden">NP_MOD</span>
                         </div>
                         <div className="flex gap-3 items-center">
                             <div className="text-xs bg-neutral-700 px-2 py-1 rounded text-neutral-300">
                                 Ch{currentChapter} • {chapterProgress}/{chapterLevels.length} • {levelIdx + 1}/90
                             </div>
+                            <button 
+                                onClick={() => setShowHelp(true)} 
+                                className="flex items-center gap-1 bg-neutral-700 hover:bg-neutral-600 px-2 py-1 rounded text-xs transition border border-neutral-600"
+                                title={lang === 'id' ? 'Bantuan' : 'Help'}
+                            >
+                                <HelpCircleIcon />
+                            </button>
                             <button onClick={() => setLang(l => l === 'en' ? 'id' : 'en')} className="flex items-center gap-1 bg-neutral-700 hover:bg-neutral-600 px-2 py-1 rounded text-xs transition border border-neutral-600">
                                 <GlobeIcon /> {lang.toUpperCase()}
                             </button>
+                            <button 
+                                onClick={loadHTML} 
+                                className="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1 transition shadow-lg shadow-purple-900/20"
+                            >
+                                <FolderOpenIcon /> <span className="hidden sm:inline">{lang === 'id' ? 'MUAT' : 'LOAD'}</span>
+                            </button>
                             <button onClick={exportHTML} className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1 transition shadow-lg shadow-blue-900/20">
-                                <SaveIcon /> <span className="hidden sm:inline">EXPORT</span>
+                                <SaveIcon /> <span className="hidden sm:inline">{lang === 'id' ? 'SIMPAN' : 'SAVE'}</span>
                             </button>
                         </div>
+                        {/* Hidden file input */}
+                        <input 
+                            type="file" 
+                            ref={fileInputRef} 
+                            onChange={handleFileLoad} 
+                            accept=".html" 
+                            style={{ display: 'none' }} 
+                        />
                     </header>
 
                     <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
@@ -1331,6 +1422,88 @@
                             </div>
                         </div>
                     </div>
+
+                    {/* HELP MODAL */}
+                    {showHelp && (
+                        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setShowHelp(false)}>
+                            <div className="bg-neutral-800 border-2 border-green-500 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                                <div className="p-6">
+                                    <div className="flex items-center gap-3 mb-4 border-b border-neutral-700 pb-3">
+                                        <HelpCircleIcon className="text-green-500" />
+                                        <h2 className="text-xl font-bold text-green-500">
+                                            {lang === 'id' ? 'Bantuan: Simpan & Muat Progress' : 'Help: Save & Load Progress'}
+                                        </h2>
+                                    </div>
+                                    
+                                    <div className="space-y-4 text-neutral-300 text-sm">
+                                        <div className="bg-neutral-900 p-4 rounded border border-neutral-700">
+                                            <h3 className="text-green-400 font-bold mb-2 flex items-center gap-2">
+                                                <SaveIcon className="w-4 h-4" />
+                                                {lang === 'id' ? '💾 SIMPAN (SAVE)' : '💾 SAVE'}
+                                            </h3>
+                                            <p className="mb-2">
+                                                {lang === 'id' 
+                                                    ? 'Klik tombol SIMPAN untuk mengekspor website kamu beserta progress belajar.' 
+                                                    : 'Click SAVE button to export your website with learning progress.'}
+                                            </p>
+                                            <ul className="list-disc list-inside space-y-1 text-xs ml-2">
+                                                <li>{lang === 'id' ? 'File HTML akan tersimpan di folder Downloads' : 'HTML file will be saved to Downloads folder'}</li>
+                                                <li>{lang === 'id' ? 'File bisa dibuka di browser (website berfungsi normal)' : 'File can be opened in browser (website works normally)'}</li>
+                                                <li>{lang === 'id' ? 'Progress tersimpan tersembunyi di dalam file' : 'Progress is hidden inside the file'}</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="bg-neutral-900 p-4 rounded border border-neutral-700">
+                                            <h3 className="text-purple-400 font-bold mb-2 flex items-center gap-2">
+                                                <FolderOpenIcon className="w-4 h-4" />
+                                                {lang === 'id' ? '📂 MUAT (LOAD)' : '📂 LOAD'}
+                                            </h3>
+                                            <p className="mb-2">
+                                                {lang === 'id' 
+                                                    ? 'Klik tombol MUAT untuk melanjutkan progress dari file yang sudah disimpan sebelumnya.' 
+                                                    : 'Click LOAD button to continue progress from previously saved file.'}
+                                            </p>
+                                            <ul className="list-disc list-inside space-y-1 text-xs ml-2">
+                                                <li>{lang === 'id' ? 'Pilih file HTML yang sudah diekspor' : 'Select previously exported HTML file'}</li>
+                                                <li>{lang === 'id' ? 'Level, bahasa, dan kode akan dimuat otomatis' : 'Level, language, and code will be loaded automatically'}</li>
+                                                <li>{lang === 'id' ? 'Kamu bisa lanjutkan dari titik terakhir!' : 'You can continue from where you left off!'}</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="bg-green-900/20 border border-green-600/50 p-4 rounded">
+                                            <p className="text-green-400 font-bold mb-2">
+                                                {lang === 'id' ? '✨ Cara Kerjanya:' : '✨ How it works:'}
+                                            </p>
+                                            <p className="text-xs">
+                                                {lang === 'id' 
+                                                    ? 'Saat SIMPAN, aplikasi menyisipkan komentar HTML tersembunyi di akhir file yang berisi data level dan kode kamu. Saat MUAT, aplikasi membaca komentar tersebut dan mengembalikan progress kamu. File tetap berfungsi sebagai website normal!' 
+                                                    : 'When SAVING, the app inserts a hidden HTML comment at the end of the file containing your level and code data. When LOADING, the app reads this comment and restores your progress. The file still works as a normal website!'}
+                                            </p>
+                                            <div className="mt-2 bg-black/40 p-2 rounded font-mono text-[10px] text-green-300">
+                                                {`<!-- NP_MOD_SAVE_DATA: {"levelIdx": 5, "lang": "id"} -->`}
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-yellow-900/20 border border-yellow-600/50 p-3 rounded">
+                                            <p className="text-yellow-400 text-xs">
+                                                <strong>{lang === 'id' ? '⚠️ Catatan:' : '⚠️ Note:'}</strong>{' '}
+                                                {lang === 'id' 
+                                                    ? 'Simpan progress secara berkala. Jika kamu menutup browser tanpa SIMPAN, progress akan hilang.' 
+                                                    : 'Save progress regularly. If you close the browser without SAVING, progress will be lost.'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => setShowHelp(false)} 
+                                        className="mt-6 w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded transition"
+                                    >
+                                        {lang === 'id' ? 'MENGERTI!' : 'GOT IT!'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         }
